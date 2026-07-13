@@ -1,5 +1,6 @@
 package com.samuelDawid.medical_clinic.service;
 
+import com.samuelDawid.medical_clinic.exceptions.PatientNotFoundException;
 import com.samuelDawid.medical_clinic.model.Patient;
 import com.samuelDawid.medical_clinic.repository.PatientRepository;
 import lombok.NonNull;
@@ -20,7 +21,7 @@ public class PatientService {
     }
 
     public Patient findByEmail(@NonNull String email) {
-        return repository.findByEmail(email).orElseThrow(() -> new RuntimeException("Patient with email" + email + " not found"));
+        return repository.findByEmail(email).orElseThrow(() -> new PatientNotFoundException(email));
     }
 
     public Patient addNewPatient(@NonNull Patient patient) {

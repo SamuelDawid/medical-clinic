@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public interface PatientRepository {
     Patient create(Patient patient);
-    boolean delete(String id);
+    void delete(String id);
     Optional<Patient> findByEmail(String email);
     List<Patient> findAll();
     Patient update(String id, Patient patient);
