@@ -11,5 +11,4 @@ public class PatientService {
         this.repository = repository;
     }
 
-
 }
