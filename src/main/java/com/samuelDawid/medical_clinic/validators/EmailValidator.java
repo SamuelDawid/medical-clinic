@@ -16,13 +16,13 @@ public class EmailValidator implements Validator {
     public boolean validate(@NonNull String email) {
         String normalized = normalize(email);
         if (normalized.isBlank()) return false;
-        if (!hasNoWhitespace(email)) {
+        if (!hasNoWhitespace(normalized)) {
             return false;
         }
-        if (!hasExactlyOneAt(email)) {
+        if (!hasExactlyOneAt(normalized)) {
             return false;
         }
-        if (!hasValidTotalLength(email)) {
+        if (!hasValidTotalLength(normalized)) {
             return false;
         }
         int atIndex = normalized.indexOf('@');
@@ -33,7 +33,12 @@ public class EmailValidator implements Validator {
     }
 
     boolean hasNoWhitespace(String email) {
-        return email.length() == email.trim().length();
+        for (int i = 0; i < email.length(); i++) {
+            if(Character.isWhitespace(email.charAt(i))){
+                return false;
+            }
+        }
+        return true;
     }
 
     boolean hasExactlyOneAt(String email) {
