@@ -21,7 +21,7 @@ public class PatientService {
     }
 
     public Patient findByEmail(@NonNull String email) {
-
+        EmailValidator.normalize(email);
         return repository.findByEmail(email)
                 .orElseThrow(() -> new PatientNotFoundException(email));
     }
@@ -35,6 +35,7 @@ public class PatientService {
     }
 
     public void deleteByEmail(@NonNull String email) {
+        EmailValidator.normalize(email);
         repository.delete(email);
     }
 
@@ -46,7 +47,7 @@ public class PatientService {
     }
 
     public void updatePassword(@NonNull String newPassword, @NonNull String email) {
-        Patient patientToUpdate = repository.findByEmail(email).orElseThrow(() -> new PatientNotFoundException(email));
+        Patient patientToUpdate = repository.findByEmail(EmailValidator.normalize(email)).orElseThrow(() -> new PatientNotFoundException(email));
         patientToUpdate.setPassword(newPassword);
     }
 }
