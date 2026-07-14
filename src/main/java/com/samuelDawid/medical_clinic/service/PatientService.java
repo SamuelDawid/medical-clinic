@@ -4,17 +4,15 @@ import com.samuelDawid.medical_clinic.exceptions.PatientNotFoundException;
 import com.samuelDawid.medical_clinic.model.Patient;
 import com.samuelDawid.medical_clinic.repository.PatientRepository;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @Service
 public class PatientService {
     private final PatientRepository repository;
-
-    public PatientService(PatientRepository repository) {
-        this.repository = repository;
-    }
 
     public List<Patient> all() {
         return repository.findAll();
@@ -22,7 +20,8 @@ public class PatientService {
 
     public Patient findByEmail(@NonNull String email) {
 
-        return repository.findByEmail(email).orElseThrow(() -> new PatientNotFoundException(email));
+        return repository.findByEmail(email)
+                .orElseThrow(() -> new PatientNotFoundException(email));
     }
 
     public Patient addNewPatient(@NonNull Patient patient) {

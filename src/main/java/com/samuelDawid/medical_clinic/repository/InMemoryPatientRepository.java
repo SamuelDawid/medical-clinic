@@ -17,7 +17,7 @@ public class InMemoryPatientRepository implements PatientRepository {
 
     @Override
     public Patient create(@NonNull Patient patient) {
-        if (repository.containsKey(patient.getEmail())){
+        if (repository.containsKey(patient.getEmail())) {
             throw new PatientAlreadyExitsException(patient.getEmail());
         }
         repository.put(patient.getEmail(), patient);
@@ -26,7 +26,7 @@ public class InMemoryPatientRepository implements PatientRepository {
 
     @Override
     public void delete(@NonNull String email) {
-        if (!repository.containsKey(email)){
+        if (!repository.containsKey(email)) {
             throw new PatientNotFoundException(email);
         }
         repository.remove(email);
