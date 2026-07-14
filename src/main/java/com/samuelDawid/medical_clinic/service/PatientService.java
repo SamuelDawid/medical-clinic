@@ -39,6 +39,9 @@ public class PatientService {
     }
 
     public Patient update(@NonNull String email, @NonNull Patient patient) {
+        if(!emailValidator.validate(patient.getEmail())){
+            throw new InvalidEmailException(patient.getEmail());
+        }
         return repository.update(email, patient);
     }
 

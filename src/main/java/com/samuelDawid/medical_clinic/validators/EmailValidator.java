@@ -2,9 +2,11 @@ package com.samuelDawid.medical_clinic.validators;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.util.regex.Pattern;
 
+@Component
 @RequiredArgsConstructor
 public class EmailValidator implements Validator {
     private static final Pattern LOCAL_CHARS = Pattern.compile("[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+");
