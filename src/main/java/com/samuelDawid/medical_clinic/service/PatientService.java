@@ -21,6 +21,7 @@ public class PatientService {
     }
 
     public Patient findByEmail(@NonNull String email) {
+
         return repository.findByEmail(email).orElseThrow(() -> new PatientNotFoundException(email));
     }
 
