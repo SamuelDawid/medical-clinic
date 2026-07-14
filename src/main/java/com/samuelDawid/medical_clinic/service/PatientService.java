@@ -33,7 +33,12 @@ public class PatientService {
         repository.delete(email);
     }
 
-    public Patient update(@NonNull String id, @NonNull Patient patient) {
-        return repository.update(id, patient);
+    public Patient update(@NonNull String email, @NonNull Patient patient) {
+        return repository.update(email, patient);
+    }
+
+    public void updatePassword(@NonNull String newPassword, @NonNull String email) {
+        Patient patientToUpdate = repository.findByEmail(email).orElseThrow(() -> new PatientNotFoundException(email));
+        patientToUpdate.setPassword(newPassword);
     }
 }
