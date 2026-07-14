@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class InMemoryPatientRepository implements PatientRepository {
-    private Map<String, Patient> repository = new ConcurrentHashMap<>();
+    private final Map<String, Patient> repository = new ConcurrentHashMap<>();
 
     @Override
     public Patient create(@NonNull Patient patient) {
