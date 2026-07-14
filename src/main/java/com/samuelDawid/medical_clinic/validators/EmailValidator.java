@@ -93,7 +93,7 @@ public class EmailValidator implements Validator {
         return DOMAIN_CHARS.matcher(domain).matches();
     }
 
-    String normalize(String email) {
+    public static String normalize(String email) {
         return email.trim().toLowerCase();
     }
 }
