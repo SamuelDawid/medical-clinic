@@ -1,5 +1,7 @@
 package com.samuelDawid.medical_clinic.repository;
 
+import com.samuelDawid.medical_clinic.exceptions.PatientAlreadyExitsException;
+import com.samuelDawid.medical_clinic.exceptions.PatientNotFoundException;
 import com.samuelDawid.medical_clinic.model.Patient;
 import lombok.NonNull;
 import org.springframework.stereotype.Repository;
@@ -15,14 +17,18 @@ public class InMemoryPatientRepository implements PatientRepository {
 
     @Override
     public Patient create(@NonNull Patient patient) {
-        if (repository.containsKey(patient.getEmail())) throw new IllegalArgumentException("Patient already exists");
+        if (repository.containsKey(patient.getEmail())){
+            throw new PatientAlreadyExitsException(patient.getEmail());
+        }
         repository.put(patient.getEmail(), patient);
         return patient;
     }
 
     @Override
     public void delete(@NonNull String email) {
-        if (!repository.containsKey(email)) throw new IllegalArgumentException("Patient does not exist");
+        if (!repository.containsKey(email)){
+            throw new PatientNotFoundException(email);
+        }
         repository.remove(email);
     }
 
