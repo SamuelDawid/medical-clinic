@@ -5,7 +5,7 @@ import com.samuelDawid.medical_clinic.dto.PatientDto;
 import com.samuelDawid.medical_clinic.model.Patient;
 import org.springframework.stereotype.Component;
 
-@Component
+
 public class PatientMapper {
 
     private PatientMapper() {}

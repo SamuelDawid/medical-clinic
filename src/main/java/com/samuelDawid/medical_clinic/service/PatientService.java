@@ -1,8 +1,11 @@
 package com.samuelDawid.medical_clinic.service;
 
+import com.samuelDawid.medical_clinic.dto.CreatePatientCommand;
+import com.samuelDawid.medical_clinic.dto.PatientDto;
 import com.samuelDawid.medical_clinic.exceptions.InvalidEmailException;
 import com.samuelDawid.medical_clinic.exceptions.PatientNotFoundException;
 import com.samuelDawid.medical_clinic.model.Patient;
+import com.samuelDawid.medical_clinic.patientMapper.PatientMapper;
 import com.samuelDawid.medical_clinic.repository.PatientRepository;
 import com.samuelDawid.medical_clinic.validators.EmailValidator;
 import lombok.NonNull;
@@ -16,22 +19,29 @@ import java.util.List;
 public class PatientService {
     private final PatientRepository repository;
     private final EmailValidator emailValidator;
-    public List<Patient> all() {
-        return repository.findAll();
+
+    public List<PatientDto> all() {
+        return repository.findAll().stream().map(PatientMapper::toPatientDto).toList();
     }
 
-    public Patient findByEmail(@NonNull String email) {
+    public PatientDto findByEmail(@NonNull String email) {
         EmailValidator.normalize(email);
-        return repository.findByEmail(email)
+        Patient patient = repository.findByEmail(email)
                 .orElseThrow(() -> new PatientNotFoundException(email));
+        return PatientMapper.toPatientDto(patient);
     }
 
-    public Patient addNewPatient(@NonNull Patient patient) {
-        if(!emailValidator.validate(patient.getEmail())){
-            throw new InvalidEmailException(patient.getEmail());
+    public PatientDto addNewPatient(@NonNull CreatePatientCommand patientCommand) {
+        String emailNormalizer = EmailValidator.normalize(patientCommand.email());
+
+        if(!emailValidator.validate(emailNormalizer)){
+            throw new InvalidEmailException(patientCommand.email());
         }
-        patient.setEmail(EmailValidator.normalize(patient.getEmail()));
-        return repository.create(patient);
+
+        Patient patient = PatientMapper.toEntity(patientCommand);
+        patient.setEmail(emailNormalizer);
+        repository.create(patient);
+        return PatientMapper.toPatientDto(patient);
     }
 
     public void deleteByEmail(@NonNull String email) {
@@ -39,11 +49,14 @@ public class PatientService {
         repository.delete(email);
     }
 
-    public Patient update(@NonNull String email, @NonNull Patient patient) {
+    public PatientDto updatePatient(@NonNull String email, @NonNull CreatePatientCommand patientCommand) {
+        Patient patient = PatientMapper.toEntity(patientCommand);
+        patient.setEmail(EmailValidator.normalize(email));
         if(!emailValidator.validate(patient.getEmail())){
             throw new InvalidEmailException(patient.getEmail());
         }
-        return repository.update(email, patient);
+        repository.update(email, patient);
+        return PatientMapper.toPatientDto(patient);
     }
 
     public void updatePassword(@NonNull String newPassword, @NonNull String email) {
