@@ -1,5 +1,7 @@
 package com.samuelDawid.medical_clinic.controller;
 
+import com.samuelDawid.medical_clinic.dto.CreatePatientCommand;
+import com.samuelDawid.medical_clinic.dto.PatientDto;
 import com.samuelDawid.medical_clinic.model.Patient;
 import com.samuelDawid.medical_clinic.service.PatientService;
 import lombok.RequiredArgsConstructor;
@@ -14,10 +16,11 @@ import java.util.List;
 public class PatientController {
     private final PatientService patientService;
 
-    @GetMapping
-    public List<Patient> findAll() {
-        return patientService.all();
-    }
+//    @GetMapping
+//    public List<PatientDto> findAll() {
+//        // mapper
+//        return patientService.all();
+//    }
 
     @GetMapping("/{email}")
     public Patient ById(@PathVariable String email) {
@@ -26,14 +29,28 @@ public class PatientController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Patient create(@RequestBody Patient patient) {
-        return patientService.addNewPatient(patient);
+    public Patient create(@RequestBody CreatePatientCommand createDto) {
+        return patientService.addNewPatient(new Patient(createDto.getEmail(),
+                createDto.getPassword(),
+                createDto.getIdCardNo(),
+                createDto.getFirstName(),
+                createDto.getLastName(),
+                createDto.getBirthDay(),
+                createDto.getPhoneNumber()
+                ));
     }
 
     @PutMapping("/{email}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public Patient update(@PathVariable String email, @RequestBody Patient patient) {
-        return patientService.update(email, patient);
+    public Patient update(@PathVariable String email, @RequestBody CreatePatientCommand createDto) {
+        Patient newPatient = new Patient(createDto.getEmail(),
+                createDto.getPassword(),
+                createDto.getIdCardNo(),
+                createDto.getFirstName(),
+                createDto.getLastName(),
+                createDto.getBirthDay(),
+                createDto.getPhoneNumber());
+        return patientService.update(email, newPatient);
     }
 
     @PatchMapping("/{email}/password")
