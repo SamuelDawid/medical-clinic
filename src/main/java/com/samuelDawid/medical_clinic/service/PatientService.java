@@ -19,29 +19,30 @@ import java.util.List;
 public class PatientService {
     private final PatientRepository repository;
     private final EmailValidator emailValidator;
+    PatientMapper patientMapper;
 
     public List<PatientDto> all() {
-        return repository.findAll().stream().map(PatientMapper::toPatientDto).toList();
+        return repository.findAll().stream().map((a) -> patientMapper.toPatientDto(a)).toList();
     }
 
     public PatientDto findByEmail(@NonNull String email) {
         EmailValidator.normalize(email);
         Patient patient = repository.findByEmail(email)
                 .orElseThrow(() -> new PatientNotFoundException(email));
-        return PatientMapper.toPatientDto(patient);
+        return patientMapper.toPatientDto(patient);
     }
 
     public PatientDto addNewPatient(@NonNull CreatePatientCommand patientCommand) {
         String emailNormalizer = EmailValidator.normalize(patientCommand.email());
 
-        if(!emailValidator.validate(emailNormalizer)){
+        if (!emailValidator.validate(emailNormalizer)) {
             throw new InvalidEmailException(patientCommand.email());
         }
 
-        Patient patient = PatientMapper.toEntity(patientCommand);
+        Patient patient = patientMapper.toEntity(patientCommand);
         patient.setEmail(emailNormalizer);
         repository.create(patient);
-        return PatientMapper.toPatientDto(patient);
+        return patientMapper.toPatientDto(patient);
     }
 
     public void deleteByEmail(@NonNull String email) {
@@ -50,13 +51,13 @@ public class PatientService {
     }
 
     public PatientDto updatePatient(@NonNull String email, @NonNull CreatePatientCommand patientCommand) {
-        Patient patient = PatientMapper.toEntity(patientCommand);
+        Patient patient = patientMapper.toEntity(patientCommand);
         patient.setEmail(EmailValidator.normalize(email));
-        if(!emailValidator.validate(patient.getEmail())){
+        if (!emailValidator.validate(patient.getEmail())) {
             throw new InvalidEmailException(patient.getEmail());
         }
         repository.update(email, patient);
-        return PatientMapper.toPatientDto(patient);
+        return patientMapper.toPatientDto(patient);
     }
 
     public void updatePassword(@NonNull String newPassword, @NonNull String email) {
