@@ -36,4 +36,3 @@ public class Patient {
         this.phoneNumber = phoneNumber;
     }
 }
-
