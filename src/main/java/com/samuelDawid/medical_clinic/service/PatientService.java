@@ -21,7 +21,7 @@ public class PatientService {
     private final EmailValidator emailValidator;
     private final PatientMapper mapperInstance;
 
-    public List<PatientDto> all() {
+    public List<PatientDto> findAll() {
         return repository.findAll().stream().map(mapperInstance::toPatientDto).toList();
     }
 

@@ -18,7 +18,7 @@ public class PatientController {
 
     @GetMapping
     public List<PatientDto> findAll() {
-        return patientService.all();
+        return patientService.findAll();
     }
 
     @GetMapping("/{email}")
