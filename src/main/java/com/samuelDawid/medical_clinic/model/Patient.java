@@ -1,15 +1,12 @@
 package com.samuelDawid.medical_clinic.model;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.Data;
 
 import java.time.LocalDate;
 import java.util.Objects;
 
-@Getter
+@Data
 @Builder
-@EqualsAndHashCode
-//@Entity
 public class Patient {
     String email;
     String password;
@@ -18,7 +15,6 @@ public class Patient {
     String lastName;
     LocalDate birthDay;
     String phoneNumber;
-    // public Patient(){}
 
     public Patient(String email, String password, String idCardNo, String firstName, String lastName, LocalDate birthDay, String phoneNumber) {
         Objects.requireNonNull(email);
