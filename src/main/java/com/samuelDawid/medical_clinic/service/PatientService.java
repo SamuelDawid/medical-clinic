@@ -32,7 +32,7 @@ public class PatientService {
         return mapperInstance.toPatientDto(patient);
     }
 
-    public PatientDto addNewPatient(@NonNull CreatePatientCommand patientCommand) {
+    public PatientDto addPatient(@NonNull CreatePatientCommand patientCommand) {
         String emailNormalizer = EmailValidator.normalize(patientCommand.email());
 
         if (!emailValidator.validate(emailNormalizer)) {
@@ -61,7 +61,8 @@ public class PatientService {
     }
 
     public void updatePassword(@NonNull String newPassword, @NonNull String email) {
-        Patient patientToUpdate = repository.findByEmail(EmailValidator.normalize(email)).orElseThrow(() -> new PatientNotFoundException(email));
+        Patient patientToUpdate = repository.findByEmail(EmailValidator.normalize(email))
+                .orElseThrow(() -> new PatientNotFoundException(email));
         patientToUpdate.setPassword(newPassword);
     }
 }

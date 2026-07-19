@@ -1,5 +1,6 @@
 package com.samuelDawid.medical_clinic.controller;
 
+import com.samuelDawid.medical_clinic.dto.ChangePasswordCommand;
 import com.samuelDawid.medical_clinic.dto.CreatePatientCommand;
 import com.samuelDawid.medical_clinic.dto.PatientDto;
 import com.samuelDawid.medical_clinic.service.PatientService;
@@ -28,7 +29,7 @@ public class PatientController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public PatientDto create(@RequestBody CreatePatientCommand createDto) {
-        return patientService.addNewPatient(createDto);
+        return patientService.addPatient(createDto);
     }
 
     @PutMapping("/{email}")
@@ -39,8 +40,8 @@ public class PatientController {
 
     @PatchMapping("/{email}/password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void changePassword(@PathVariable String email, @RequestBody String newPassword) {
-        patientService.updatePassword(newPassword, email);
+    public void changePassword(@PathVariable String email, @RequestBody ChangePasswordCommand newPassword) {
+        patientService.updatePassword(newPassword.password(), email);
     }
 
     @DeleteMapping("/{email}")
@@ -48,6 +49,4 @@ public class PatientController {
     public void delete(@PathVariable String email) {
         patientService.deleteByEmail(email);
     }
-
-
 }

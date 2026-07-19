@@ -34,7 +34,7 @@ public class EmailValidator implements Validator {
         return isValidLocal(local) && isValidDomain(domain);
     }
 
-    boolean hasNoWhitespace(String email) {
+    private boolean hasNoWhitespace(String email) {
         for (int i = 0; i < email.length(); i++) {
             if(Character.isWhitespace(email.charAt(i))){
                 return false;
@@ -43,7 +43,7 @@ public class EmailValidator implements Validator {
         return true;
     }
 
-    boolean hasExactlyOneAt(String email) {
+    private boolean hasExactlyOneAt(String email) {
         int counter = 0;
         for (int i = 0; i < email.length(); i++) {
             if (email.charAt(i) == '@') {
@@ -53,11 +53,11 @@ public class EmailValidator implements Validator {
         return counter == 1;
     }
 
-    boolean hasValidTotalLength(String email) {
+    private boolean hasValidTotalLength(String email) {
         return email.length() < 255;
     }
 
-    boolean isValidLocal(String local) {
+    private boolean isValidLocal(String local) {
         if (local.isEmpty()) {
             return false;
         }
@@ -73,7 +73,7 @@ public class EmailValidator implements Validator {
         return LOCAL_CHARS.matcher(local).matches();
     }
 
-    boolean isValidDomain(String domain) {
+    private boolean isValidDomain(String domain) {
         if (domain.isEmpty()) {
             return false;
         }
