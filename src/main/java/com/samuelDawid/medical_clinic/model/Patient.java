@@ -1,35 +1,21 @@
 package com.samuelDawid.medical_clinic.model;
-import lombok.Builder;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.Objects;
 
 @Data
-@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Patient {
-    String email;
-    String password;
-    String idCardNo;
-    String firstName;
-    String lastName;
-    LocalDate birthDay;
-    String phoneNumber;
+    private String email;
+    private String password;
+    private String idCardNo;
+    private String firstName;
+    private String lastName;
+    private LocalDate birthDay;
+    private String phoneNumber;
 
-    public Patient(String email, String password, String idCardNo, String firstName, String lastName, LocalDate birthDay, String phoneNumber) {
-        Objects.requireNonNull(email);
-        Objects.requireNonNull(password);
-        Objects.requireNonNull(idCardNo);
-        Objects.requireNonNull(firstName);
-        Objects.requireNonNull(lastName);
-        Objects.requireNonNull(phoneNumber);
-        if (birthDay.isAfter(LocalDate.now())) throw new IllegalArgumentException("Invalid birth date");
-        this.email = email;
-        this.password = password;
-        this.idCardNo = idCardNo;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.birthDay = birthDay;
-        this.phoneNumber = phoneNumber;
-    }
 }
