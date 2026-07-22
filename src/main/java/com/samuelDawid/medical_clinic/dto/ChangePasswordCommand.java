@@ -1,4 +1,9 @@
 package com.samuelDawid.medical_clinic.dto;
 
-public record ChangePasswordCommand(String password) {
+import io.swagger.v3.oas.annotations.media.Schema;
+
+public record ChangePasswordCommand(
+        @Schema(description = "Account password", example = "newPassword123",
+                requiredMode = Schema.RequiredMode.REQUIRED)
+        String password) {
 }
