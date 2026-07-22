@@ -26,8 +26,11 @@ public class PatientService {
     }
 
     public PatientDto findByEmail(@NonNull String email) {
-        EmailValidator.normalize(email);
-        Patient patient = repository.findByEmail(email)
+        String normalized = EmailValidator.normalize(email);
+        if (emailValidator.validate(normalized)) {
+            throw new InvalidEmailException(email);
+        }
+        Patient patient = repository.findByEmail(normalized)
                 .orElseThrow(() -> new PatientNotFoundException(email));
         return mapperInstance.toPatientDto(patient);
     }
@@ -46,8 +49,12 @@ public class PatientService {
     }
 
     public void deleteByEmail(@NonNull String email) {
-        EmailValidator.normalize(email);
-        repository.delete(email);
+        String emailNormalizer = EmailValidator.normalize(email);
+
+        if (!emailValidator.validate(emailNormalizer)) {
+            throw new InvalidEmailException(email);
+        }
+        repository.delete(emailNormalizer);
     }
 
     public PatientDto updatePatient(@NonNull String email, @NonNull CreatePatientCommand patientCommand) {
