@@ -8,7 +8,7 @@ public record CreatePatientCommand(
         @Schema(description = "Email address", example = "JohnDoe@example.com",
                 requiredMode = Schema.RequiredMode.REQUIRED)
         String email,
-        @Schema(description = "Account password", example = "newPassword123",
+        @Schema(description = "Account nePassword", example = "newPassword123",
                 requiredMode = Schema.RequiredMode.REQUIRED)
         String password,
         @Schema(description = "ID card number", example = "1005200004554",
