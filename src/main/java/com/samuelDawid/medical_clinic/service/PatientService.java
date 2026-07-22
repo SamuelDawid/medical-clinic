@@ -3,6 +3,7 @@ package com.samuelDawid.medical_clinic.service;
 import com.samuelDawid.medical_clinic.dto.CreatePatientCommand;
 import com.samuelDawid.medical_clinic.dto.PatientDto;
 import com.samuelDawid.medical_clinic.exceptions.InvalidEmailException;
+import com.samuelDawid.medical_clinic.exceptions.InvalidPasswordException;
 import com.samuelDawid.medical_clinic.exceptions.PatientNotFoundException;
 import com.samuelDawid.medical_clinic.model.Patient;
 import com.samuelDawid.medical_clinic.patientMapper.PatientMapper;
@@ -68,8 +69,13 @@ public class PatientService {
     }
 
     public void updatePassword(@NonNull String newPassword, @NonNull String email) {
+        if(newPassword.isBlank()){
+            throw new InvalidPasswordException();
+        }
+        String emailNormalizer = EmailValidator.normalize(email);
         Patient patientToUpdate = repository.findByEmail(EmailValidator.normalize(email))
                 .orElseThrow(() -> new PatientNotFoundException(email));
         patientToUpdate.setPassword(newPassword);
+        repository.update(emailNormalizer,patientToUpdate);
     }
 }
