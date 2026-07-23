@@ -27,11 +27,10 @@ public class PatientService {
     }
 
     public PatientDto findByEmail(@NonNull String email) {
-        String normalized = EmailValidator.normalize(email);
-        if (emailValidator.validate(normalized)) {
+        if (!emailValidator.validate(email)) {
             throw new InvalidEmailException(email);
         }
-        Patient patient = repository.findByEmail(normalized)
+        Patient patient = repository.findByEmail(email)
                 .orElseThrow(() -> new PatientNotFoundException(email));
         return mapperInstance.toPatientDto(patient);
     }
