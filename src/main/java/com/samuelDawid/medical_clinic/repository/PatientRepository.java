@@ -1,14 +1,12 @@
 package com.samuelDawid.medical_clinic.repository;
 
 import com.samuelDawid.medical_clinic.model.Patient;
-import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
 import java.util.Optional;
 
-public interface PatientRepository {
-    Patient create(Patient patient);
-    void delete(String id);
+@Repository
+public interface PatientRepository extends JpaRepository<Patient, Long> {
     Optional<Patient> findByEmail(String email);
-    List<Patient> findAll();
-    Patient update(String id, Patient patient);
-
 }
