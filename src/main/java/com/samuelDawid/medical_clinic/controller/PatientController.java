@@ -33,9 +33,17 @@ public class PatientController {
             @ApiResponse(responseCode = "400", description = "Invalid email supplied")
     })
     @GetMapping("/{email}")
-    public PatientDto ById(@PathVariable String email) {
+    public PatientDto byEmail(@PathVariable String email) {
         return patientService.findByEmail(email);
     }
+    @Operation(summary = "Get patient by id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Patient found"),
+            @ApiResponse(responseCode = "404", description = "Patient not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid email supplied")
+    })
+    @GetMapping("/{id}")
+    public PatientDto byId(@PathVariable Long id){return patientService.findById(id);}
 
     @Operation(summary = "Create Patient")
     @ApiResponses(value = {
