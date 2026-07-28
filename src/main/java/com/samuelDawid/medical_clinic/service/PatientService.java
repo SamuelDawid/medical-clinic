@@ -6,8 +6,8 @@ import com.samuelDawid.medical_clinic.exceptions.InvalidEmailException;
 import com.samuelDawid.medical_clinic.exceptions.InvalidPasswordException;
 import com.samuelDawid.medical_clinic.exceptions.PatientNotFoundException;
 import com.samuelDawid.medical_clinic.exceptions.PatientWithIdNotFoundException;
-import com.samuelDawid.medical_clinic.model.Patient;
 import com.samuelDawid.medical_clinic.mappers.PatientMapper;
+import com.samuelDawid.medical_clinic.model.Patient;
 import com.samuelDawid.medical_clinic.repository.PatientRepository;
 import com.samuelDawid.medical_clinic.validators.EmailValidator;
 import jakarta.validation.constraints.NotNull;
@@ -36,10 +36,12 @@ public class PatientService {
                 .orElseThrow(() -> new PatientNotFoundException(email));
         return mapperInstance.toPatientDto(patient);
     }
-    public PatientDto findById(@NotNull Long id){
+
+    public PatientDto findById(@NotNull Long id) {
         Patient patientToFind = repository.findById(id).orElseThrow(PatientWithIdNotFoundException::new);
         return mapperInstance.toPatientDto(patientToFind);
     }
+
     public PatientDto addPatient(@NonNull CreatePatientCommand patientCommand) {
         String emailNormalizer = EmailValidator.normalize(patientCommand.email());
 
@@ -63,7 +65,8 @@ public class PatientService {
                 .orElseThrow(() -> new PatientNotFoundException(email));
         repository.delete(patientToDelete);
     }
-    public void deleteById(@NonNull Long id){
+
+    public void deleteById(@NonNull Long id) {
         Patient patientToDelete = repository.findById(id)
                 .orElseThrow(PatientWithIdNotFoundException::new);
         repository.delete(patientToDelete);
@@ -80,7 +83,7 @@ public class PatientService {
     }
 
     public void updatePassword(@NonNull String newPassword, @NonNull String email) {
-        if(newPassword.isBlank()){
+        if (newPassword.isBlank()) {
             throw new InvalidPasswordException();
         }
         Patient patientToUpdate = repository.findByEmail(EmailValidator.normalize(email))

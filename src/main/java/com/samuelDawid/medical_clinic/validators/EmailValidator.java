@@ -36,7 +36,7 @@ public class EmailValidator implements Validator {
 
     private boolean hasNoWhitespace(String email) {
         for (int i = 0; i < email.length(); i++) {
-            if(Character.isWhitespace(email.charAt(i))){
+            if (Character.isWhitespace(email.charAt(i))) {
                 return false;
             }
         }
