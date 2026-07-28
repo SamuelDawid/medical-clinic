@@ -1,7 +1,7 @@
-package com.samuelDawid.medical_clinic.patientMapper;
+package com.samuelDawid.medical_clinic.mappers;
 
-import com.samuelDawid.medical_clinic.dto.CreatePatientCommand;
-import com.samuelDawid.medical_clinic.dto.PatientDto;
+import com.samuelDawid.medical_clinic.dto.patient.CreatePatientCommand;
+import com.samuelDawid.medical_clinic.dto.patient.PatientDto;
 import com.samuelDawid.medical_clinic.model.Patient;
 import org.mapstruct.Mapper;
 
