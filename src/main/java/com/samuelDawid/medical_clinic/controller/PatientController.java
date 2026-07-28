@@ -13,12 +13,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 @Tag(name = "Patients", description = "Operations for managing patient records")
 @RequestMapping("/patients")
 @RestController
 @RequiredArgsConstructor
 public class PatientController {
     private final PatientService patientService;
+
     @Operation(summary = "Get all available Patients")
     @ApiResponse(responseCode = "200", description = "Returned all patients")
     @GetMapping
@@ -55,6 +57,7 @@ public class PatientController {
     public PatientDto create(@RequestBody CreatePatientCommand createDto) {
         return patientService.addPatient(createDto);
     }
+
     @Operation(summary = "Updates Patient Details")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Patient Updated Successfully"),
@@ -66,6 +69,7 @@ public class PatientController {
     public PatientDto update(@PathVariable String email, @RequestBody CreatePatientCommand createDto) {
         return patientService.updatePatient(email, createDto);
     }
+
     @Operation(summary = "Change Patient Password")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Password Updated Successfully"),
@@ -77,6 +81,7 @@ public class PatientController {
     public void changePassword(@PathVariable String email, @RequestBody ChangePasswordCommand newPassword) {
         patientService.updatePassword(newPassword.newPassword(), email);
     }
+
     @Operation(summary = "Delete Patient")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Patient Deleted Successfully"),
