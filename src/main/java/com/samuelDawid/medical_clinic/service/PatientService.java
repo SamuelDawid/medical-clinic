@@ -1,13 +1,13 @@
 package com.samuelDawid.medical_clinic.service;
 
-import com.samuelDawid.medical_clinic.dto.CreatePatientCommand;
-import com.samuelDawid.medical_clinic.dto.PatientDto;
+import com.samuelDawid.medical_clinic.dto.patient.CreatePatientCommand;
+import com.samuelDawid.medical_clinic.dto.patient.PatientDto;
 import com.samuelDawid.medical_clinic.exceptions.InvalidEmailException;
 import com.samuelDawid.medical_clinic.exceptions.InvalidPasswordException;
 import com.samuelDawid.medical_clinic.exceptions.PatientNotFoundException;
 import com.samuelDawid.medical_clinic.exceptions.PatientWithIdNotFoundException;
 import com.samuelDawid.medical_clinic.model.Patient;
-import com.samuelDawid.medical_clinic.patientMapper.PatientMapper;
+import com.samuelDawid.medical_clinic.mappers.PatientMapper;
 import com.samuelDawid.medical_clinic.repository.PatientRepository;
 import com.samuelDawid.medical_clinic.validators.EmailValidator;
 import jakarta.validation.constraints.NotNull;

@@ -1,4 +1,4 @@
-package com.samuelDawid.medical_clinic.dto;
+package com.samuelDawid.medical_clinic.dto.patient;
 
 
 import io.swagger.v3.oas.annotations.media.Schema;

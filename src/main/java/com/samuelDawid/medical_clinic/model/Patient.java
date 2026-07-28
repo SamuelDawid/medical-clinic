@@ -1,9 +1,6 @@
 package com.samuelDawid.medical_clinic.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,6 +10,7 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "PATIENT")
 public class Patient {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,4 +22,8 @@ public class Patient {
     private String lastName;
     private LocalDate birthDay;
     private String phoneNumber;
+
+    @OneToOne
+    @JoinColumn(name = "user_id",referencedColumnName = "id")
+    private User user;
 }

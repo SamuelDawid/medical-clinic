@@ -1,8 +1,8 @@
 package com.samuelDawid.medical_clinic.controller;
 
-import com.samuelDawid.medical_clinic.dto.ChangePasswordCommand;
-import com.samuelDawid.medical_clinic.dto.CreatePatientCommand;
-import com.samuelDawid.medical_clinic.dto.PatientDto;
+import com.samuelDawid.medical_clinic.dto.patient.ChangePasswordCommand;
+import com.samuelDawid.medical_clinic.dto.patient.CreatePatientCommand;
+import com.samuelDawid.medical_clinic.dto.patient.PatientDto;
 import com.samuelDawid.medical_clinic.service.PatientService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -36,14 +36,14 @@ public class PatientController {
     public PatientDto byEmail(@PathVariable String email) {
         return patientService.findByEmail(email);
     }
-    @Operation(summary = "Get patient by id")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Patient found"),
-            @ApiResponse(responseCode = "404", description = "Patient not found"),
-            @ApiResponse(responseCode = "400", description = "Invalid email supplied")
-    })
-    @GetMapping("/{id}")
-    public PatientDto byId(@PathVariable Long id){return patientService.findById(id);}
+//    @Operation(summary = "Get patient by id")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "Patient found"),
+//            @ApiResponse(responseCode = "404", description = "Patient not found"),
+//            @ApiResponse(responseCode = "400", description = "Invalid email supplied")
+//    })
+//    @GetMapping("/{id}")
+//    public PatientDto byId(@PathVariable Long id){return patientService.findById(id);}
 
     @Operation(summary = "Create Patient")
     @ApiResponses(value = {
