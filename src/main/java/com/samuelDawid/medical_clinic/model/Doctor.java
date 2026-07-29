@@ -13,8 +13,12 @@ import lombok.NoArgsConstructor;
 public class Doctor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String medicalSpecialty;
     @ManyToOne
     @JoinColumn(name = "institution_id")
     private Institution institution;
+    @OneToOne
+    @JoinColumn(name = "user_id",referencedColumnName = "id",unique = true)
+    User user;
 }
