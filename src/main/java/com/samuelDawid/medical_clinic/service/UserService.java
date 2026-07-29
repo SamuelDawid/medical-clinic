@@ -1,6 +1,6 @@
 package com.samuelDawid.medical_clinic.service;
 
-import com.samuelDawid.medical_clinic.dto.patient.ChangePasswordCommand;
+import com.samuelDawid.medical_clinic.dto.ChangePasswordCommand;
 import com.samuelDawid.medical_clinic.dto.user.CreateUserCommand;
 import com.samuelDawid.medical_clinic.dto.user.UserDto;
 import com.samuelDawid.medical_clinic.exceptions.InvalidPasswordException;

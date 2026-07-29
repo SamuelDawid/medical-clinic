@@ -1,6 +1,8 @@
 package com.samuelDawid.medical_clinic.dto.patient;
 
+import com.samuelDawid.medical_clinic.dto.user.CreateUserCommand;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.mapstruct.Mapping;
 
 import java.time.LocalDate;
 
@@ -8,9 +10,6 @@ public record CreatePatientCommand(
         @Schema(description = "Email address", example = "JohnDoe@example.com",
                 requiredMode = Schema.RequiredMode.REQUIRED)
         String email,
-        @Schema(description = "Account newPassword", example = "newPassword123",
-                requiredMode = Schema.RequiredMode.REQUIRED)
-        String password,
         @Schema(description = "ID card number", example = "1005200004554",
                 requiredMode = Schema.RequiredMode.REQUIRED)
         String idCardNo,
@@ -25,7 +24,9 @@ public record CreatePatientCommand(
         LocalDate birthDay,
         @Schema(description = "Phone number", example = "+48 609567865",
                 requiredMode = Schema.RequiredMode.REQUIRED)
-        String phoneNumber
+        String phoneNumber,
+        @Mapping(target = "user",ignore = true)
+        CreateUserCommand user
 ) {
 }
 

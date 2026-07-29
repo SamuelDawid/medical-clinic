@@ -8,6 +8,7 @@ import com.samuelDawid.medical_clinic.exceptions.PatientNotFoundException;
 import com.samuelDawid.medical_clinic.exceptions.PatientWithIdNotFoundException;
 import com.samuelDawid.medical_clinic.mappers.PatientMapper;
 import com.samuelDawid.medical_clinic.model.Patient;
+import com.samuelDawid.medical_clinic.model.User;
 import com.samuelDawid.medical_clinic.repository.PatientRepository;
 import com.samuelDawid.medical_clinic.validators.EmailValidator;
 import jakarta.validation.constraints.NotNull;
@@ -51,6 +52,10 @@ public class PatientService {
 
         Patient patient = mapperInstance.toEntity(patientCommand);
         patient.setEmail(emailNormalizer);
+        User user = new User();
+        user.setUserName(patientCommand.user().userName());
+        user.setPassword(patientCommand.user().password());
+        patient.setUser(user);
         repository.save(patient);
         return mapperInstance.toPatientDto(patient);
     }
@@ -88,7 +93,7 @@ public class PatientService {
         }
         Patient patientToUpdate = repository.findByEmail(EmailValidator.normalize(email))
                 .orElseThrow(() -> new PatientNotFoundException(email));
-        patientToUpdate.setPassword(newPassword);
+        patientToUpdate.getUser().setPassword(newPassword);
         repository.save(patientToUpdate);
     }
 }

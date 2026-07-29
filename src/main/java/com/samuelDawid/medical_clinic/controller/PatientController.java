@@ -1,6 +1,6 @@
 package com.samuelDawid.medical_clinic.controller;
 
-import com.samuelDawid.medical_clinic.dto.patient.ChangePasswordCommand;
+import com.samuelDawid.medical_clinic.dto.ChangePasswordCommand;
 import com.samuelDawid.medical_clinic.dto.patient.CreatePatientCommand;
 import com.samuelDawid.medical_clinic.dto.patient.PatientDto;
 import com.samuelDawid.medical_clinic.service.PatientService;
