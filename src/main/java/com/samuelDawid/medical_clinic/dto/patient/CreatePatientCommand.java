@@ -16,7 +16,7 @@ public record CreatePatientCommand(
         @Schema(description = "Phone number", example = "+48 609567865",
                 requiredMode = Schema.RequiredMode.REQUIRED)
         String phoneNumber,
-        @Mapping(target = "user",ignore = true)
+        @Mapping(target = "user")
         CreateUserCommand user
 ) {
 }
