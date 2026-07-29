@@ -4,13 +4,11 @@ import com.samuelDawid.medical_clinic.dto.ChangePasswordCommand;
 import com.samuelDawid.medical_clinic.dto.user.CreateUserCommand;
 import com.samuelDawid.medical_clinic.dto.user.UserDto;
 import com.samuelDawid.medical_clinic.exceptions.InvalidPasswordException;
-import com.samuelDawid.medical_clinic.exceptions.InvalidUsernameException;
 import com.samuelDawid.medical_clinic.exceptions.UserAlreadyExistsException;
 import com.samuelDawid.medical_clinic.exceptions.UserNotFoundException;
 import com.samuelDawid.medical_clinic.mappers.UserMapper;
 import com.samuelDawid.medical_clinic.model.User;
 import com.samuelDawid.medical_clinic.repository.UserRepository;
-import com.samuelDawid.medical_clinic.validators.UserNameValidator;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
@@ -22,18 +20,13 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final UserNameValidator validator;
 
     public List<UserDto> findAll() {
         return userRepository.findAll().stream().map(userMapper::toDto).toList();
     }
 
-    // CRUD Operacje
     public UserDto create(@NonNull CreateUserCommand command) {
-        if (!validator.validate(command.userName())) {
-            throw new InvalidUsernameException();
-        }
-        if (userRepository.findAll().stream().map(User::getUserName).toList().contains(command.userName())) {
+        if (userRepository.findAll().stream().map(User::getEmail).toList().contains(command.email())) {
             throw new UserAlreadyExistsException();
         }
         if (command.password().isBlank()) {
