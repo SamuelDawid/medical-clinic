@@ -3,6 +3,7 @@ package com.samuelDawid.medical_clinic.controller;
 import com.samuelDawid.medical_clinic.dto.institution.CreateInstitutionCommand;
 import com.samuelDawid.medical_clinic.dto.institution.InstitutionDto;
 import com.samuelDawid.medical_clinic.dto.institution.PatchInsitutionCommand;
+import com.samuelDawid.medical_clinic.service.InsitutionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -18,14 +19,14 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class InstitutionController {
-    private final InstitutionController controller;
+    private final InsitutionService service;
 
     @Operation(summary = "Get all users")
     @ApiResponse(description = "Get all users", responseCode = "200")
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
     public List<InstitutionDto> findAll() {
-        return controller.findAll();
+        return service.findAll();
     }
 
     @Operation(summary = "Get by id")
@@ -36,7 +37,7 @@ public class InstitutionController {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{id}")
     public InstitutionDto findById(@PathVariable Long id) {
-        return controller.findById(id);
+        return service.findById(id);
     }
 
     @Operation(summary = "Create Institution")
@@ -47,7 +48,7 @@ public class InstitutionController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public InstitutionDto create(@RequestBody CreateInstitutionCommand command) {
-        return controller.create(command);
+        return service.create(command);
     }
 
     @Operation(summary = "Update Institution")
@@ -59,8 +60,9 @@ public class InstitutionController {
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public InstitutionDto update(@PathVariable Long id, @RequestBody PatchInsitutionCommand command) {
-        return controller.update(id, command);
+        return service.update(id, command);
     }
+
     @Operation(summary = "Delete Institution")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Institution Deleted Successfully"),
@@ -70,6 +72,6 @@ public class InstitutionController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
-         controller.delete(id);
+        service.delete(id);
     }
 }
