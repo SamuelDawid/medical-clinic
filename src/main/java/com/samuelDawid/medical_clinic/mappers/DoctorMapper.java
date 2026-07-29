@@ -11,5 +11,5 @@ public interface DoctorMapper {
     Doctor toEntity(CreateDoctorCommand command);
     @Mapping(target = "institutionDto",source = "institution")
     @Mapping(target = "userDto", source = "user")
-    DoctorDto toResponse(Doctor doctor);
+    DoctorDto toDto(Doctor doctor);
 }

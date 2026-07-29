@@ -93,18 +93,7 @@ public class PatientService {
         if(patientCommand.phoneNumber() != null){
             patient.setPhoneNumber(patientCommand.phoneNumber());
         }
-        if(patientCommand.user() != null){
-            User user = patient.getUser();
-            if(patientCommand.user().firstName() != null){
-                user.setFirstName(patientCommand.user().firstName());
-            }
-            if(patientCommand.user().email() != null){
-                user.setEmail(patientCommand.user().email());
-            }
-            if(patientCommand.user().lastName() != null){
-                user.setLastName(patientCommand.user().lastName());
-            }
-        }
+        DoctorService.PatchUser(patientCommand.user(), patient.getUser(), command, doctor);
 
         return patientMapper.toPatientDto(patient);
     }
