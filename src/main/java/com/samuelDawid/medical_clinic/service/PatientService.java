@@ -1,16 +1,16 @@
 package com.samuelDawid.medical_clinic.service;
 
 import com.samuelDawid.medical_clinic.dto.patient.CreatePatientCommand;
+import com.samuelDawid.medical_clinic.dto.patient.PatchPatientCommand;
 import com.samuelDawid.medical_clinic.dto.patient.PatientDto;
-import com.samuelDawid.medical_clinic.exceptions.InvalidEmailException;
-import com.samuelDawid.medical_clinic.exceptions.InvalidPasswordException;
-import com.samuelDawid.medical_clinic.exceptions.PatientNotFoundException;
-import com.samuelDawid.medical_clinic.exceptions.PatientWithIdNotFoundException;
+import com.samuelDawid.medical_clinic.exceptions.*;
 import com.samuelDawid.medical_clinic.mappers.PatientMapper;
+import com.samuelDawid.medical_clinic.mappers.UserMapper;
 import com.samuelDawid.medical_clinic.model.Patient;
 import com.samuelDawid.medical_clinic.model.User;
 import com.samuelDawid.medical_clinic.repository.PatientRepository;
 import com.samuelDawid.medical_clinic.validators.EmailValidator;
+import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -23,41 +23,44 @@ import java.util.List;
 public class PatientService {
     private final PatientRepository repository;
     private final EmailValidator emailValidator;
-    private final PatientMapper mapperInstance;
+    private final PatientMapper patientMapper;
+    private final UserMapper userMapper;
 
     public List<PatientDto> findAll() {
-        return repository.findAll().stream().map(mapperInstance::toPatientDto).toList();
+        return repository.findAll().stream().map(patientMapper::toPatientDto).toList();
     }
 
     public PatientDto findByEmail(@NonNull String email) {
+        String normalize = EmailValidator.normalize(email);
         if (!emailValidator.validate(email)) {
             throw new InvalidEmailException(email);
         }
-        Patient patient = repository.findByEmail(email)
+        Patient patient = repository.findByUserEmail(normalize)
                 .orElseThrow(() -> new PatientNotFoundException(email));
-        return mapperInstance.toPatientDto(patient);
+        return patientMapper.toPatientDto(patient);
     }
 
     public PatientDto findById(@NotNull Long id) {
         Patient patientToFind = repository.findById(id).orElseThrow(PatientWithIdNotFoundException::new);
-        return mapperInstance.toPatientDto(patientToFind);
+        return patientMapper.toPatientDto(patientToFind);
     }
 
     public PatientDto addPatient(@NonNull CreatePatientCommand patientCommand) {
-        String emailNormalizer = EmailValidator.normalize(patientCommand.email());
+        String emailNormalizer = EmailValidator.normalize(patientCommand.user().email());
 
         if (!emailValidator.validate(emailNormalizer)) {
-            throw new InvalidEmailException(patientCommand.email());
+            throw new InvalidEmailException(patientCommand.user().email());
         }
+        if(repository.findByUserEmail(emailNormalizer).isPresent()){
+            throw new PatientAlreadyExistsException(emailNormalizer);
+        }
+        Patient patient = patientMapper.toEntity(patientCommand);
+        User user = userMapper.toEntity(patientCommand.user());
+        user.setEmail(emailNormalizer);
 
-        Patient patient = mapperInstance.toEntity(patientCommand);
-        patient.setEmail(emailNormalizer);
-        User user = new User();
-        user.setUserName(patientCommand.user().userName());
-        user.setPassword(patientCommand.user().password());
         patient.setUser(user);
         repository.save(patient);
-        return mapperInstance.toPatientDto(patient);
+        return patientMapper.toPatientDto(patient);
     }
 
     public void deleteByEmail(@NonNull String email) {
@@ -66,7 +69,7 @@ public class PatientService {
         if (!emailValidator.validate(emailNormalizer)) {
             throw new InvalidEmailException(email);
         }
-        Patient patientToDelete = repository.findByEmail(email)
+        Patient patientToDelete = repository.findByUserEmail(emailNormalizer)
                 .orElseThrow(() -> new PatientNotFoundException(email));
         repository.delete(patientToDelete);
     }
@@ -76,22 +79,41 @@ public class PatientService {
                 .orElseThrow(PatientWithIdNotFoundException::new);
         repository.delete(patientToDelete);
     }
+    @Transactional
+    public PatientDto updatePatient(@NonNull Long id, @NonNull PatchPatientCommand patientCommand) {
+        Patient patient = repository.findById(id)
+                        .orElseThrow(PatientWithIdNotFoundException::new);
 
-    public PatientDto updatePatient(@NonNull String email, @NonNull CreatePatientCommand patientCommand) {
-        Patient patient = mapperInstance.toEntity(patientCommand);
-        patient.setEmail(EmailValidator.normalize(email));
-        if (!emailValidator.validate(patient.getEmail())) {
-            throw new InvalidEmailException(patient.getEmail());
+        if(patientCommand.idCardNo() != null){
+            patient.setIdCardNo(patientCommand.idCardNo());
         }
-        repository.save(patient);
-        return mapperInstance.toPatientDto(patient);
+        if(patientCommand.birthDay() != null){
+            patient.setBirthDay(patientCommand.birthDay());
+        }
+        if(patientCommand.phoneNumber() != null){
+            patient.setPhoneNumber(patientCommand.phoneNumber());
+        }
+        if(patientCommand.user() != null){
+            User user = patient.getUser();
+            if(patientCommand.user().firstName() != null){
+                user.setFirstName(patientCommand.user().firstName());
+            }
+            if(patientCommand.user().email() != null){
+                user.setEmail(patientCommand.user().email());
+            }
+            if(patientCommand.user().lastName() != null){
+                user.setLastName(patientCommand.user().lastName());
+            }
+        }
+
+        return patientMapper.toPatientDto(patient);
     }
 
     public void updatePassword(@NonNull String newPassword, @NonNull String email) {
         if (newPassword.isBlank()) {
             throw new InvalidPasswordException();
         }
-        Patient patientToUpdate = repository.findByEmail(EmailValidator.normalize(email))
+        Patient patientToUpdate = repository.findByUserEmail(EmailValidator.normalize(email))
                 .orElseThrow(() -> new PatientNotFoundException(email));
         patientToUpdate.getUser().setPassword(newPassword);
         repository.save(patientToUpdate);
