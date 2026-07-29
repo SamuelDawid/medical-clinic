@@ -14,9 +14,8 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    // zmiana na email -> userName
-    String userName;
+    private String firstName;
+    private String lastName;
+    private String email;
     String password;
-    @OneToOne(mappedBy = "user")
-    private Patient patient;
 }
