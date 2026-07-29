@@ -18,7 +18,7 @@ public class Doctor {
     @ManyToOne
     @JoinColumn(name = "institution_id")
     private Institution institution;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, optional = false)
     @JoinColumn(name = "user_id",referencedColumnName = "id",unique = true)
     User user;
 }

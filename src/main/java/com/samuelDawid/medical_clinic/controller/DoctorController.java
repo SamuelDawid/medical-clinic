@@ -53,7 +53,7 @@ public class DoctorController {
         return service.create(command);
     }
 
-    @Operation(summary = "Update Institution")
+    @Operation(summary = "Update Doctor")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Doctor Updated Successfully"),
             @ApiResponse(responseCode = "400", description = "Doctor id supplied"),
@@ -64,7 +64,7 @@ public class DoctorController {
     public DoctorDto update(@PathVariable Long id, @RequestBody PatchDoctorCommand command) {
         return service.update(id, command);
     }
-    @Operation(summary = "Delete Institution")
+    @Operation(summary = "Delete Doctor")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Doctor Deleted Successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid id supplied"),

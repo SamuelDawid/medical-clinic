@@ -19,7 +19,7 @@ public class Institution {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(unique = true)
-    private String Name;
+    private String name;
     @Embedded
     private Address address;
 

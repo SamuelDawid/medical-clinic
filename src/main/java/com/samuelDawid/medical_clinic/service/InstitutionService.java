@@ -17,7 +17,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class InsitutionService {
+public class InstitutionService {
     private final InstitutionRepository repository;
     private final InstitutionMapper mapper;
 
@@ -31,7 +31,7 @@ public class InsitutionService {
 
     public InstitutionDto create(@NonNull CreateInstitutionCommand command) {
         Institution institution = mapper.toEntity(command);
-        if (repository.findAll().contains(institution)) {
+        if (repository.findByName(command.name()).isPresent()){
             throw new InstitutionAlreadyExistsException();
         }
         repository.save(institution);
@@ -41,8 +41,8 @@ public class InsitutionService {
     @Transactional
     public InstitutionDto update(@NonNull Long id, @NonNull PatchInsitutionCommand command) {
         Institution institution = repository.findById(id).orElseThrow(InstitutionNotFoundException::new);
-        if (command.Name() != null) {
-            institution.setName(command.Name());
+        if (command.name() != null) {
+            institution.setName(command.name());
         }
         if (command.city() != null) {
             institution.getAddress().setCity(command.city());

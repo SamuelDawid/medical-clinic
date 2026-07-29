@@ -3,7 +3,7 @@ package com.samuelDawid.medical_clinic.controller;
 import com.samuelDawid.medical_clinic.dto.institution.CreateInstitutionCommand;
 import com.samuelDawid.medical_clinic.dto.institution.InstitutionDto;
 import com.samuelDawid.medical_clinic.dto.institution.PatchInsitutionCommand;
-import com.samuelDawid.medical_clinic.service.InsitutionService;
+import com.samuelDawid.medical_clinic.service.InstitutionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -19,7 +19,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class InstitutionController {
-    private final InsitutionService service;
+    private final InstitutionService service;
 
     @Operation(summary = "Get all users")
     @ApiResponse(description = "Get all users", responseCode = "200")
