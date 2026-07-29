@@ -7,18 +7,9 @@ import org.mapstruct.Mapping;
 import java.time.LocalDate;
 
 public record CreatePatientCommand(
-        @Schema(description = "Email address", example = "JohnDoe@example.com",
-                requiredMode = Schema.RequiredMode.REQUIRED)
-        String email,
         @Schema(description = "ID card number", example = "1005200004554",
                 requiredMode = Schema.RequiredMode.REQUIRED)
         String idCardNo,
-        @Schema(description = "First name", example = "John",
-                requiredMode = Schema.RequiredMode.REQUIRED)
-        String firstName,
-        @Schema(description = "Surname", example = "Doe",
-                requiredMode = Schema.RequiredMode.REQUIRED)
-        String lastName,
         @Schema(description = "Birth date in ISO format (YYYY-MM-DD)", example = "2000-02-22",
                 requiredMode = Schema.RequiredMode.REQUIRED)
         LocalDate birthDay,
