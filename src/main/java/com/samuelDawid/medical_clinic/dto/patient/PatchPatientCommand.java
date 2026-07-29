@@ -1,6 +1,6 @@
 package com.samuelDawid.medical_clinic.dto.patient;
 
-import com.samuelDawid.medical_clinic.dto.user.CreateUserCommand;
+import com.samuelDawid.medical_clinic.dto.user.PatchUserCommand;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.mapstruct.Mapping;
 
@@ -17,6 +17,6 @@ public record PatchPatientCommand(
                 requiredMode = Schema.RequiredMode.REQUIRED)
         String phoneNumber,
         @Mapping(target = "user")
-        CreateUserCommand user
+        PatchUserCommand user
 ) {
 }

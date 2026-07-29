@@ -3,12 +3,10 @@ package com.samuelDawid.medical_clinic.service;
 import com.samuelDawid.medical_clinic.dto.doctor.CreateDoctorCommand;
 import com.samuelDawid.medical_clinic.dto.doctor.DoctorDto;
 import com.samuelDawid.medical_clinic.dto.doctor.PatchDoctorCommand;
-import com.samuelDawid.medical_clinic.dto.user.CreateUserCommand;
 import com.samuelDawid.medical_clinic.exceptions.DoctorNotFoundException;
 import com.samuelDawid.medical_clinic.exceptions.InstitutionAlreadyExistsException;
 import com.samuelDawid.medical_clinic.mappers.DoctorMapper;
 import com.samuelDawid.medical_clinic.model.Doctor;
-import com.samuelDawid.medical_clinic.model.User;
 import com.samuelDawid.medical_clinic.repository.DoctorRepository;
 import jakarta.transaction.Transactional;
 import lombok.NonNull;
@@ -22,6 +20,7 @@ import java.util.List;
 public class DoctorService {
     private final DoctorRepository repository;
     private final DoctorMapper mapper;
+    private final UserPatcher userPatcher;
 
     public List<DoctorDto> findAll() {
         return repository.findAll().stream().map(mapper::toDto).toList();
@@ -46,24 +45,11 @@ public class DoctorService {
         if (command.medicalSpecialty() != null) {
             doctor.setMedicalSpecialty(command.medicalSpecialty());
         }
-        PatchUser(command.user(), doctor.getUser(), command, doctor);
+        if (command.user() != null) {
+            userPatcher.apply(command.user(), doctor.getUser());
+        }
 
         return mapper.toDto(doctor);
-    }
-
-    static void PatchUser(CreateUserCommand user2, User user3, @NonNull PatchDoctorCommand command, Doctor doctor) {
-        if (user2 != null) {
-            User user = user3;
-            if (user2.firstName() != null) {
-                user.setFirstName(user2.firstName());
-            }
-            if (user2.email() != null) {
-                user.setEmail(user2.email());
-            }
-            if (user2.lastName() != null) {
-                user.setLastName(user2.lastName());
-            }
-        }
     }
 
     public void delete(@NonNull Long id) {

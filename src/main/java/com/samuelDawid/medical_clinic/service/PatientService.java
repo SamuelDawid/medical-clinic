@@ -25,6 +25,7 @@ public class PatientService {
     private final EmailValidator emailValidator;
     private final PatientMapper patientMapper;
     private final UserMapper userMapper;
+    private final UserPatcher userPatcher;
 
     public List<PatientDto> findAll() {
         return repository.findAll().stream().map(patientMapper::toPatientDto).toList();
@@ -93,7 +94,9 @@ public class PatientService {
         if(patientCommand.phoneNumber() != null){
             patient.setPhoneNumber(patientCommand.phoneNumber());
         }
-        DoctorService.PatchUser(patientCommand.user(), patient.getUser(), command, doctor);
+        if(patientCommand.user() != null){
+            userPatcher.apply(patientCommand.user(),patient.getUser());
+        }
 
         return patientMapper.toPatientDto(patient);
     }
