@@ -1,6 +1,8 @@
 package com.samuelDawid.medical_clinic.controller;
 
+import com.samuelDawid.medical_clinic.dto.doctor.DoctorDto;
 import com.samuelDawid.medical_clinic.dto.institution.CreateInstitutionCommand;
+import com.samuelDawid.medical_clinic.dto.institution.InstitutionDoctorsDto;
 import com.samuelDawid.medical_clinic.dto.institution.InstitutionDto;
 import com.samuelDawid.medical_clinic.dto.institution.PatchInsitutionCommand;
 import com.samuelDawid.medical_clinic.service.InstitutionService;
@@ -13,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @Tag(name = "Institution", description = "Operations for managing institution records")
 @RequestMapping("/institutions")
@@ -21,8 +24,8 @@ import java.util.List;
 public class InstitutionController {
     private final InstitutionService service;
 
-    @Operation(summary = "Get all users")
-    @ApiResponse(description = "Get all users", responseCode = "200")
+    @Operation(summary = "Get all Institutions")
+    @ApiResponse(description = "Get all Institutions", responseCode = "200")
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
     public List<InstitutionDto> findAll() {
@@ -38,6 +41,27 @@ public class InstitutionController {
     @GetMapping("/{id}")
     public InstitutionDto findById(@PathVariable Long id) {
         return service.findById(id);
+    }
+
+    @Operation(summary = "Get doctors from Institution")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Doctors found"),
+            @ApiResponse(responseCode = "404", description = "Institution not found"),
+    })
+    @GetMapping("/doctors/{name}")
+    @ResponseStatus(HttpStatus.OK)
+    public Set<DoctorDto> findDoctorsByInstitutionName(@PathVariable String name) {
+        return service.showDoctors(name);
+    }
+
+    @Operation(summary = "Add list of doctors to Institution")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Doctors added Successfully")
+    })
+    @PatchMapping("/institution/doctors/{name}")
+    @ResponseStatus(HttpStatus.OK)
+    public InstitutionDoctorsDto addDoctorsToInstitution(@RequestBody Set<Long> doctorsId, @PathVariable String name) {
+        return service.addDoctorsToInstitution(doctorsId, name);
     }
 
     @Operation(summary = "Create Institution")
