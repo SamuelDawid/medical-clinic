@@ -5,10 +5,7 @@ import com.samuelDawid.medical_clinic.dto.doctor.DoctorDto;
 import com.samuelDawid.medical_clinic.dto.doctor.PatchDoctorCommand;
 import com.samuelDawid.medical_clinic.exceptions.DoctorAlreadyExistsException;
 import com.samuelDawid.medical_clinic.exceptions.DoctorNotFoundException;
-import com.samuelDawid.medical_clinic.exceptions.InstitutionAlreadyExistsException;
-import com.samuelDawid.medical_clinic.exceptions.InstitutionNotFoundException;
 import com.samuelDawid.medical_clinic.mappers.DoctorMapper;
-import com.samuelDawid.medical_clinic.mappers.InstitutionMapperImpl;
 import com.samuelDawid.medical_clinic.mappers.UserMapper;
 import com.samuelDawid.medical_clinic.model.Doctor;
 import com.samuelDawid.medical_clinic.model.User;
@@ -21,7 +18,10 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @RequiredArgsConstructor
 @Service
@@ -50,9 +50,14 @@ public class DoctorService {
         User user = userMapper.toEntity(command.user());
         user.setEmail(email);
         doctor.setUser(user);
-        Institution institution = institutionRepository.findById(command.institutionId())
-                .orElseThrow(InstitutionNotFoundException::new);
-        doctor.setInstitution(institution);
+        Set<Institution> institutions = new HashSet<>();
+        for (Long id : command.institutionId()) {
+            if (id != null) {
+                Optional<Institution> inst = institutionRepository.findById(id);
+                inst.ifPresent(institutions::add);
+            }
+        }
+        doctor.setInstitutions(institutions);
         repository.save(doctor);
         return mapper.toDto(doctor);
     }
