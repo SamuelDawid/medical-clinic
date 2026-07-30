@@ -23,6 +23,6 @@ public class Institution {
     @Embedded
     private Address address;
 
-    @OneToMany(mappedBy = "institution")
+    @ManyToMany(mappedBy = "institutions")
     private Set<Doctor> doctors = new HashSet<>();
 }
