@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -15,9 +17,13 @@ public class Doctor {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String medicalSpecialty;
-    @ManyToOne
-    @JoinColumn(name = "institution_id")
-    private Institution institution;
+    @ManyToMany
+    @JoinTable(
+            name = "doctors",
+            joinColumns = @JoinColumn(name = "doctor_id"),
+            inverseJoinColumns = @JoinColumn(name = "institution_id")
+    )
+    private Set<Institution> institutions;
     @OneToOne(cascade = CascadeType.ALL, optional = false)
     @JoinColumn(name = "user_id",referencedColumnName = "id",unique = true)
     User user;
