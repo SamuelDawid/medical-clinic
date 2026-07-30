@@ -11,8 +11,10 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface InstitutionMapper {
     Institution toEntity(CreateInstitutionCommand command);
+
     InstitutionDto toDto(Institution institution);
 
     Address toEntity(CreateAddressCommand command);
+
     AddressDto toDto(Address address);
 }
