@@ -22,11 +22,16 @@ public class UserService {
     private final UserMapper userMapper;
 
     public List<UserDto> findAll() {
-        return userRepository.findAll().stream().map(userMapper::toDto).toList();
+        return userRepository.findAll().stream()
+                .map(userMapper::toDto)
+                .toList();
     }
 
     public UserDto create(@NonNull CreateUserCommand command) {
-        if (userRepository.findAll().stream().map(User::getEmail).toList().contains(command.email())) {
+        if (userRepository.findAll().stream()
+                .map(User::getEmail)
+                .toList()
+                .contains(command.email())) {
             throw new UserAlreadyExistsException();
         }
         if (command.password().isBlank()) {
@@ -38,7 +43,8 @@ public class UserService {
     }
 
     public UserDto findById(@NonNull Long id) {
-        User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findById(id)
+                .orElseThrow(UserNotFoundException::new);
         return userMapper.toDto(user);
     }
 
@@ -46,13 +52,15 @@ public class UserService {
         if (command.newPassword().isBlank()) {
             throw new InvalidPasswordException();
         }
-        User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findById(id)
+                .orElseThrow(UserNotFoundException::new);
         user.setPassword(command.newPassword());
         userRepository.save(user);
     }
 
     public void deleteUser(@NonNull Long id) {
-        User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findById(id)
+                .orElseThrow(UserNotFoundException::new);
         userRepository.delete(user);
     }
 }

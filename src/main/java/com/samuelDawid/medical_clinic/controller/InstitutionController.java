@@ -48,20 +48,20 @@ public class InstitutionController {
             @ApiResponse(responseCode = "200", description = "Doctors found"),
             @ApiResponse(responseCode = "404", description = "Institution not found"),
     })
-    @GetMapping("/doctors/{name}")
+    @GetMapping("/{id}/doctors")
     @ResponseStatus(HttpStatus.OK)
-    public Set<DoctorDto> findDoctorsByInstitutionName(@PathVariable String name) {
-        return service.showDoctors(name);
+    public Set<DoctorDto> findDoctorsByInstitutionName(@PathVariable Long id) {
+        return service.showDoctors(id);
     }
 
     @Operation(summary = "Add list of doctors to Institution")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Doctors added Successfully")
     })
-    @PatchMapping("/institution/doctors/{name}")
+    @PatchMapping("/institution/{id}/doctors")
     @ResponseStatus(HttpStatus.OK)
-    public InstitutionDoctorsDto addDoctorsToInstitution(@RequestBody Set<Long> doctorsId, @PathVariable String name) {
-        return service.addDoctorsToInstitution(doctorsId, name);
+    public InstitutionDoctorsDto addDoctorsToInstitution(@RequestBody Set<Long> doctorsId, @PathVariable Long id) {
+        return service.addDoctorsToInstitution(doctorsId, id);
     }
 
     @Operation(summary = "Create Institution")

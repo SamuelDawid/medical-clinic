@@ -3,9 +3,6 @@ package com.samuelDawid.medical_clinic.controller;
 import com.samuelDawid.medical_clinic.dto.doctor.CreateDoctorCommand;
 import com.samuelDawid.medical_clinic.dto.doctor.DoctorDto;
 import com.samuelDawid.medical_clinic.dto.doctor.PatchDoctorCommand;
-import com.samuelDawid.medical_clinic.dto.institution.CreateInstitutionCommand;
-import com.samuelDawid.medical_clinic.dto.institution.InstitutionDto;
-import com.samuelDawid.medical_clinic.dto.institution.PatchInsitutionCommand;
 import com.samuelDawid.medical_clinic.service.DoctorService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -23,6 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DoctorController {
     private final DoctorService service;
+
     @Operation(summary = "Get all doctors")
     @ApiResponse(description = "Get all doctors", responseCode = "200")
     @ResponseStatus(HttpStatus.OK)
@@ -64,6 +62,7 @@ public class DoctorController {
     public DoctorDto update(@PathVariable Long id, @RequestBody PatchDoctorCommand command) {
         return service.update(id, command);
     }
+
     @Operation(summary = "Delete Doctor")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Doctor Deleted Successfully"),

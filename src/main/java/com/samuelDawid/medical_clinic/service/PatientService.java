@@ -28,45 +28,30 @@ public class PatientService {
     private final UserPatcher userPatcher;
 
     public List<PatientDto> findAll() {
-        return repository.findAll().stream().map(patientMapper::toPatientDto).toList();
-    }
-
-    public PatientDto findByEmail(@NonNull String email) {
-        String normalize = EmailValidator.normalize(email);
-        if (!emailValidator.validate(email)) {
-            throw new InvalidEmailException(email);
-        }
-        Patient patient = repository.findByUserEmail(normalize)
-                .orElseThrow(() -> new PatientNotFoundException(email));
-        return patientMapper.toPatientDto(patient);
+        return repository.findAll().stream()
+                .map(patientMapper::toPatientDto)
+                .toList();
     }
 
     public PatientDto findById(@NotNull Long id) {
-        Patient patientToFind = repository.findById(id).orElseThrow(PatientWithIdNotFoundException::new);
+        Patient patientToFind = repository.findById(id)
+                .orElseThrow(PatientWithIdNotFoundException::new);
         return patientMapper.toPatientDto(patientToFind);
     }
 
     public PatientDto addPatient(@NonNull CreatePatientCommand patientCommand) {
         String emailNormalizer = EmailValidator.normalize(patientCommand.user().email());
+        emailValidator.validate(emailNormalizer);
+        validateEmailIsFree(emailNormalizer);
 
-        if (!emailValidator.validate(emailNormalizer)) {
-            throw new InvalidEmailException(patientCommand.user().email());
-        }
-        if(repository.findByUserEmail(emailNormalizer).isPresent()){
-            throw new PatientAlreadyExistsException(emailNormalizer);
-        }
-        Patient patient = patientMapper.toEntity(patientCommand);
-        User user = userMapper.toEntity(patientCommand.user());
-        user.setEmail(emailNormalizer);
+        Patient patient = patientBuilder(patientCommand,emailNormalizer);
 
-        patient.setUser(user);
         repository.save(patient);
         return patientMapper.toPatientDto(patient);
     }
 
     public void deleteByEmail(@NonNull String email) {
         String emailNormalizer = EmailValidator.normalize(email);
-
         if (!emailValidator.validate(emailNormalizer)) {
             throw new InvalidEmailException(email);
         }
@@ -84,20 +69,7 @@ public class PatientService {
     public PatientDto updatePatient(@NonNull Long id, @NonNull PatchPatientCommand patientCommand) {
         Patient patient = repository.findById(id)
                         .orElseThrow(PatientWithIdNotFoundException::new);
-
-        if(patientCommand.idCardNo() != null){
-            patient.setIdCardNo(patientCommand.idCardNo());
-        }
-        if(patientCommand.birthDay() != null){
-            patient.setBirthDay(patientCommand.birthDay());
-        }
-        if(patientCommand.phoneNumber() != null){
-            patient.setPhoneNumber(patientCommand.phoneNumber());
-        }
-        if(patientCommand.user() != null){
-            userPatcher.apply(patientCommand.user(),patient.getUser());
-        }
-
+        patient.update(patientCommand,userPatcher);
         return patientMapper.toPatientDto(patient);
     }
 
@@ -109,5 +81,17 @@ public class PatientService {
                 .orElseThrow(() -> new PatientNotFoundException(email));
         patientToUpdate.getUser().setPassword(newPassword);
         repository.save(patientToUpdate);
+    }
+    private void validateEmailIsFree(String email) {
+        if(repository.findByUserEmail(email).isPresent()){
+            throw new PatientAlreadyExistsException(email);
+        }
+    }
+    private Patient patientBuilder(@NonNull CreatePatientCommand patientCommand,String email){
+        Patient patient = patientMapper.toEntity(patientCommand);
+        User user = userMapper.toEntity(patientCommand.user());
+        user.setEmail(email);
+        patient.setUser(user);
+        return patient;
     }
 }

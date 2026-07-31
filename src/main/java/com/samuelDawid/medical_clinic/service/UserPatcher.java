@@ -7,9 +7,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserPatcher {
     public void apply(PatchUserCommand command, User user) {
-        if (command == null) return;
-        if (command.firstName() != null) user.setFirstName(command.firstName());
-        if (command.lastName()  != null) user.setLastName(command.lastName());
-        if (command.email()     != null) user.setEmail(command.email());
+        if (command == null){ return;}
+        if (command.firstName() != null) {user.setFirstName(command.firstName());}
+        if (command.lastName()  != null) {user.setLastName(command.lastName());}
+        if (command.email()     != null) {user.setEmail(command.email());}
     }
 }

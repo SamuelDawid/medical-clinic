@@ -10,6 +10,5 @@ import java.util.Set;
 @Repository
 public interface DoctorRepository extends JpaRepository<Doctor, Long> {
     Optional<Doctor> findByUserEmail(String email);
-
-    Set<Doctor> findByInstitutionsName(String institutionName);
+    Set<Doctor> findByInstitutionsId(Long institutionId);
 }
