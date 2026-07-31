@@ -1,0 +1,48 @@
+package com.samuelDawid.medical_clinic.model.institution;
+
+import com.samuelDawid.medical_clinic.dto.institution.PatchInsitutionCommand;
+import com.samuelDawid.medical_clinic.model.Doctor;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "INSTITUTION")
+public class Institution {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(unique = true)
+    private String name;
+    @Embedded
+    private Address address;
+
+    @ManyToMany(mappedBy = "institutions")
+    private Set<Doctor> doctors = new HashSet<>();
+
+    public void update(@NonNull PatchInsitutionCommand command) {
+        if (command.name() != null) {
+            this.setName(command.name());
+        }
+        if (command.city() != null) {
+            this.getAddress().setCity(command.city());
+        }
+        if (command.buildingNumber() != null) {
+            this.getAddress().setBuildingNumber(command.buildingNumber());
+        }
+        if (command.postCode() != null) {
+            this.getAddress().setPostCode(command.postCode());
+        }
+        if (command.street() != null) {
+            this.getAddress().setStreet(command.street());
+        }
+    }
+}
