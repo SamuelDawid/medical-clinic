@@ -15,7 +15,7 @@ public class Appointment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private LocalDateTime dateTime;
+    private LocalDateTime timeAndDate;
     private Integer appointmentLengthInMinutes;
 
     @OneToOne
