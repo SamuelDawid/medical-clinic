@@ -5,10 +5,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 
 public record CreateAppointmentCommand(
-        @Schema(description = "Patient id", example = "1")
+        @Schema(description = "Patient id, leave empty to create a free appointment the patient can book later",
+                example = "1", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         Long patientId,
-        @Schema(description = "Doctor id", example = "2")
+        @Schema(description = "Doctor id", example = "2", requiredMode = Schema.RequiredMode.REQUIRED)
         Long doctorId,
+        @Schema(description = "Appointment length in minutes", example = "30",
+                requiredMode = Schema.RequiredMode.REQUIRED)
+        Integer appointmentLengthInMinutes,
+        @Schema(description = "Start of the appointment, must be in the future and start at a full quarter of an hour",
+                example = "2026-08-10T10:15:00", requiredMode = Schema.RequiredMode.REQUIRED)
         LocalDateTime timeAndDate
 
 ) {
