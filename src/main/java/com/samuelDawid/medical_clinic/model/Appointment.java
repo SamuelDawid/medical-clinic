@@ -6,7 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 @Getter
@@ -17,12 +19,15 @@ public class Appointment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private LocalDateTime timeAndDate;
+    private LocalDate date;
+    private LocalTime time;
     private Integer appointmentLengthInMinutes;
 
-    @OneToOne
+    @ManyToOne
+    @JoinColumn(name = "patient_id")
     private Patient patient;
 
-    @OneToOne
+    @ManyToOne
+    @JoinColumn(name = "doctor_id")
     private Doctor doctor;
 }
