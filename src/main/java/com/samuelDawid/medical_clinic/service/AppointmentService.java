@@ -1,6 +1,7 @@
 package com.samuelDawid.medical_clinic.service;
 
 import com.samuelDawid.medical_clinic.dto.appointment.AppointmentDto;
+import com.samuelDawid.medical_clinic.dto.appointment.AssignPatientToAppointmentCommand;
 import com.samuelDawid.medical_clinic.dto.appointment.CreateAppointmentCommand;
 import com.samuelDawid.medical_clinic.exceptions.*;
 import com.samuelDawid.medical_clinic.mappers.AppointmentMapper;
@@ -46,11 +47,23 @@ public class AppointmentService {
 
         Doctor doctor = doctorRepository.findById(command.doctorId())
                 .orElseThrow(DoctorNotFoundException::new);
+        appointment.setDoctor(doctor);
+        if (command.patientId() != null) {
+            Patient patient = patientRepository.findById(command.patientId())
+                    .orElseThrow(PatientWithIdNotFoundException::new);
+            appointment.setPatient(patient);
+        }
+        repository.save(appointment);
+        return mapper.toDto(appointment);
+    }
+
+    public AppointmentDto assignPatientToAppointment(@NonNull AssignPatientToAppointmentCommand command) {
+        Appointment appointment = repository.findById(command.appointmentId())
+                .orElseThrow(AppointmentDoesNotExistsException::new);
+        if(appointment.getPatient() != null){ throw new AppointmentAlreadyTakenException();}
         Patient patient = patientRepository.findById(command.patientId())
                 .orElseThrow(PatientWithIdNotFoundException::new);
-        appointment.setDoctor(doctor);
         appointment.setPatient(patient);
-
         repository.save(appointment);
         return mapper.toDto(appointment);
     }
@@ -64,7 +77,7 @@ public class AppointmentService {
     private void validateDate(@NonNull LocalDateTime timeOfVisit) {
         LocalDate date = timeOfVisit.toLocalDate();
         if (date.isBefore(LocalDate.now())) {
-            throw new InvalideDateOfAppointmentException();
+            throw new InvalidDateOfAppointmentException();
         }
     }
 
@@ -80,7 +93,7 @@ public class AppointmentService {
 
         for (Appointment appointment : appointments) {
             if (isOverlappingWithExistingAppointment(appointmentToCreate, appointment)) {
-                throw new InvalideDateOfAppointmentException();
+                throw new TimeIsOverlappingWithAnotherAppointmentException();
             }
         }
     }
