@@ -9,7 +9,7 @@ public record CreateDoctorCommand(
         @Schema(description = "Medical Speciality", example = "Anesthesiologists", requiredMode = Schema.RequiredMode.REQUIRED)
         String medicalSpecialty,
         CreateUserCommand user,
-        @Schema(description = "Institution id")
+        @Schema(description = "Institution id",example = "[]")
         Set<Long> institutionId
 ) {
 }
