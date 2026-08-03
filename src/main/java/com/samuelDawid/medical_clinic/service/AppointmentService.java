@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -34,6 +33,10 @@ public class AppointmentService {
         return repository.findAll().stream().map(mapper::toDto).collect(Collectors.toSet());
     }
 
+    public Set<AppointmentDto> findAllByPatientId(@NonNull Long id) {
+        return repository.findAllByPatientId(id).stream().map(mapper::toDto).collect(Collectors.toSet());
+    }
+
     public AppointmentDto findById(@NonNull Long id) {
         Appointment appointment = repository.findById(id)
                 .orElseThrow(AppointmentDoesNotExistsException::new);
@@ -42,12 +45,14 @@ public class AppointmentService {
 
     public AppointmentDto create(@NonNull CreateAppointmentCommand command) {
         Appointment appointment = mapper.toEntity(command);
-        validateDate(appointment.getTimeAndDate());
-        validateTimeOfTheVisit(appointment);
 
         Doctor doctor = doctorRepository.findById(command.doctorId())
                 .orElseThrow(DoctorNotFoundException::new);
         appointment.setDoctor(doctor);
+
+        validateDate(appointment.getDate(), appointment.getTime());
+        validateTimeOfTheVisit(appointment);
+
         if (command.patientId() != null) {
             Patient patient = patientRepository.findById(command.patientId())
                     .orElseThrow(PatientWithIdNotFoundException::new);
@@ -60,7 +65,11 @@ public class AppointmentService {
     public AppointmentDto assignPatientToAppointment(@NonNull AssignPatientToAppointmentCommand command) {
         Appointment appointment = repository.findById(command.appointmentId())
                 .orElseThrow(AppointmentDoesNotExistsException::new);
-        if(appointment.getPatient() != null){ throw new AppointmentAlreadyTakenException();}
+        if (appointment.getPatient() != null) {
+            throw new AppointmentAlreadyTakenException();
+        }
+
+        validateDate(appointment.getDate(), appointment.getTime());
         Patient patient = patientRepository.findById(command.patientId())
                 .orElseThrow(PatientWithIdNotFoundException::new);
         appointment.setPatient(patient);
@@ -74,22 +83,22 @@ public class AppointmentService {
         repository.delete(appointment);
     }
 
-    private void validateDate(@NonNull LocalDateTime timeOfVisit) {
-        LocalDate date = timeOfVisit.toLocalDate();
-        if (date.isBefore(LocalDate.now())) {
+    private void validateDate(@NonNull LocalDate date, @NonNull LocalTime time) {
+        LocalDateTime appointment = LocalDateTime.of(date, time);
+        if (appointment.isBefore(LocalDateTime.now())) {
             throw new InvalidDateOfAppointmentException();
         }
     }
 
     private void validateTimeOfTheVisit(@NonNull Appointment appointmentToCreate) {
-        int minutes = appointmentToCreate.getTimeAndDate().getMinute();
+        int minutes = appointmentToCreate.getTime().getMinute();
         if (!validateMinutes(minutes)) {
             throw new InvalidTimeOfTheAppointmentException();
         }
-        List<Appointment> appointments = repository.findAll().stream()
-                .filter(appointment -> appointment.getTimeAndDate()
-                        .getDayOfWeek().equals(appointmentToCreate.getTimeAndDate().getDayOfWeek()))
-                .toList();
+        Set<Appointment> appointments = repository.findByDoctorAndDate(
+                appointmentToCreate.getDoctor(),
+                appointmentToCreate.getDate()
+        );
 
         for (Appointment appointment : appointments) {
             if (isOverlappingWithExistingAppointment(appointmentToCreate, appointment)) {
@@ -104,17 +113,13 @@ public class AppointmentService {
     }
 
     private boolean isOverlappingWithExistingAppointment(@NonNull Appointment appointmentToCreate, @NonNull Appointment existingAppointment) {
-        LocalTime startOfAppointmentToCreate = appointmentToCreate.getTimeAndDate().toLocalTime();
-        LocalTime endOfAppointmentToCreate = appointmentToCreate.getTimeAndDate()
-                .plusMinutes(appointmentToCreate.getAppointmentLengthInMinutes()).toLocalTime();
+        LocalTime startOfAppointmentToCreate = appointmentToCreate.getTime();
+        LocalTime endOfAppointmentToCreate = appointmentToCreate.getTime()
+                .plusMinutes(appointmentToCreate.getAppointmentLengthInMinutes());
+        LocalTime startOfExistingAppointment = existingAppointment.getTime();
+        LocalTime endOfExistingAppointment = existingAppointment.getTime()
+                .plusMinutes(existingAppointment.getAppointmentLengthInMinutes());
 
-        LocalTime startOfExistingAppointment = existingAppointment.getTimeAndDate().toLocalTime();
-        LocalTime endOfExistingAppointment = existingAppointment.getTimeAndDate()
-                .plusMinutes(existingAppointment.getAppointmentLengthInMinutes()).toLocalTime();
-
-        if (startOfAppointmentToCreate.isBefore(endOfExistingAppointment) && startOfAppointmentToCreate.isAfter(startOfExistingAppointment)) {
-            return true;
-        }
-        return endOfAppointmentToCreate.isAfter(startOfExistingAppointment) && endOfAppointmentToCreate.isBefore(endOfExistingAppointment);
+        return startOfAppointmentToCreate.isBefore(endOfExistingAppointment) && endOfAppointmentToCreate.isAfter(startOfExistingAppointment);
     }
 }
