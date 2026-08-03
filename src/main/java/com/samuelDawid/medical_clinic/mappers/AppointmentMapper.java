@@ -9,6 +9,8 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface AppointmentMapper {
+    @Mapping(target = "date", expression = "java(command.timeAndDate().toLocalDate())")
+    @Mapping(target = "time", expression = "java(command.timeAndDate().toLocalTime())")
     Appointment toEntity(CreateAppointmentCommand command);
     @Mapping(target = "doctorName", source = "doctor.user")
     @Mapping(target = "patientName", source = "patient.user")
