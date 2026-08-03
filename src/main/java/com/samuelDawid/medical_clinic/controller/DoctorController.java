@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "Doctor", description = "Operations for managing doctors records")
+@Tag(name = "Doctors", description = "Operations for managing doctors records")
 @RequestMapping("/doctor")
 @RestController
 @RequiredArgsConstructor
@@ -43,7 +43,7 @@ public class DoctorController {
     @Operation(summary = "Create Doctor")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Doctor Created Successfully"),
-            @ApiResponse(responseCode = "400", description = "Doctor Institution details")
+            @ApiResponse(responseCode = "400", description = "Invalid Doctor details")
     })
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
