@@ -19,8 +19,8 @@ public class Appointment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private LocalDate date;
-    private LocalTime time;
-    private Integer appointmentLengthInMinutes;
+    private LocalTime startTime;
+    private LocalTime endTime;
 
     @ManyToOne
     @JoinColumn(name = "patient_id")

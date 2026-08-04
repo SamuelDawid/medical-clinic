@@ -30,11 +30,17 @@ public class AppointmentService {
     private final PatientRepository patientRepository;
 
     public Set<AppointmentDto> findAll() {
-        return repository.findAll().stream().map(mapper::toDto).collect(Collectors.toSet());
+        return repository.findAll()
+                .stream()
+                .map(mapper::toDto)
+                .collect(Collectors.toSet());
     }
 
     public Set<AppointmentDto> findAllByPatientId(@NonNull Long id) {
-        return repository.findAllByPatientId(id).stream().map(mapper::toDto).collect(Collectors.toSet());
+        return repository.findAllByPatientId(id)
+                .stream()
+                .map(mapper::toDto)
+                .collect(Collectors.toSet());
     }
 
     public AppointmentDto findById(@NonNull Long id) {
@@ -50,14 +56,10 @@ public class AppointmentService {
                 .orElseThrow(DoctorNotFoundException::new);
         appointment.setDoctor(doctor);
 
-        validateDate(appointment.getDate(), appointment.getTime());
+        validateDate(appointment.getDate(), appointment.getStartTime());
         validateTimeOfTheVisit(appointment);
+        assignPatientAtAppointmentCreation(command, appointment);
 
-        if (command.patientId() != null) {
-            Patient patient = patientRepository.findById(command.patientId())
-                    .orElseThrow(PatientWithIdNotFoundException::new);
-            appointment.setPatient(patient);
-        }
         repository.save(appointment);
         return mapper.toDto(appointment);
     }
@@ -69,7 +71,7 @@ public class AppointmentService {
             throw new AppointmentAlreadyTakenException();
         }
 
-        validateDate(appointment.getDate(), appointment.getTime());
+        validateDate(appointment.getDate(), appointment.getStartTime());
         Patient patient = patientRepository.findById(command.patientId())
                 .orElseThrow(PatientWithIdNotFoundException::new);
         appointment.setPatient(patient);
@@ -90,36 +92,32 @@ public class AppointmentService {
         }
     }
 
+    private void assignPatientAtAppointmentCreation(@NonNull CreateAppointmentCommand command, Appointment appointment) {
+        if (command.patientId() != null) {
+            Patient patient = patientRepository.findById(command.patientId())
+                    .orElseThrow(PatientWithIdNotFoundException::new);
+            appointment.setPatient(patient);
+        }
+    }
+
     private void validateTimeOfTheVisit(@NonNull Appointment appointmentToCreate) {
-        int minutes = appointmentToCreate.getTime().getMinute();
+        int minutes = appointmentToCreate.getStartTime()
+                .getMinute();
         if (!validateMinutes(minutes)) {
             throw new InvalidTimeOfTheAppointmentException();
         }
-        Set<Appointment> appointments = repository.findByDoctorAndDate(
+        Set<Appointment> appointments = repository.findByDoctorAndDateAndStartTimeLessThanAndEndTimeGreaterThan(
                 appointmentToCreate.getDoctor(),
-                appointmentToCreate.getDate()
+                appointmentToCreate.getDate(),
+                appointmentToCreate.getEndTime(),
+                appointmentToCreate.getStartTime()
         );
-
-        for (Appointment appointment : appointments) {
-            if (isOverlappingWithExistingAppointment(appointmentToCreate, appointment)) {
-                throw new TimeIsOverlappingWithAnotherAppointmentException();
-            }
+        if (!appointments.isEmpty()) {
+            throw new TimeIsOverlappingWithAnotherAppointmentException();
         }
     }
 
     private boolean validateMinutes(int minutes) {
-        Set<Integer> allowedMinutes = Set.of(0, 15, 30, 45);
-        return allowedMinutes.contains(minutes);
-    }
-
-    private boolean isOverlappingWithExistingAppointment(@NonNull Appointment appointmentToCreate, @NonNull Appointment existingAppointment) {
-        LocalTime startOfAppointmentToCreate = appointmentToCreate.getTime();
-        LocalTime endOfAppointmentToCreate = appointmentToCreate.getTime()
-                .plusMinutes(appointmentToCreate.getAppointmentLengthInMinutes());
-        LocalTime startOfExistingAppointment = existingAppointment.getTime();
-        LocalTime endOfExistingAppointment = existingAppointment.getTime()
-                .plusMinutes(existingAppointment.getAppointmentLengthInMinutes());
-
-        return startOfAppointmentToCreate.isBefore(endOfExistingAppointment) && endOfAppointmentToCreate.isAfter(startOfExistingAppointment);
+        return minutes % 15 == 0;
     }
 }

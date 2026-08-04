@@ -3,6 +3,7 @@ package com.samuelDawid.medical_clinic.dto.appointment;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 public record CreateAppointmentCommand(
         @Schema(description = "Patient id, leave empty to create a free appointment the patient can book later",
@@ -10,12 +11,13 @@ public record CreateAppointmentCommand(
         Long patientId,
         @Schema(description = "Doctor id", example = "2", requiredMode = Schema.RequiredMode.REQUIRED)
         Long doctorId,
-        @Schema(description = "Appointment length in minutes", example = "30",
-                requiredMode = Schema.RequiredMode.REQUIRED)
-        Integer appointmentLengthInMinutes,
         @Schema(description = "Start of the appointment, must be in the future and start at a full quarter of an hour",
                 example = "2026-08-10T10:15:00", requiredMode = Schema.RequiredMode.REQUIRED)
-        LocalDateTime timeAndDate
+        LocalDateTime timeAndDate,
+        @Schema(description = "end of the appointment", example = "11:30",
+                requiredMode = Schema.RequiredMode.REQUIRED)
+        LocalTime endTime
+
 
 ) {
 }
