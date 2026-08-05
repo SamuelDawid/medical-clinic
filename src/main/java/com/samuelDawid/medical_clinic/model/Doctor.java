@@ -29,7 +29,7 @@ public class Doctor {
     )
     @ToString.Exclude
     private Set<Institution> institutions;
-    @OneToOne(cascade = CascadeType.ALL, optional = false)
+    @OneToOne(cascade = CascadeType.ALL, optional = false,orphanRemoval = true)
     @JoinColumn(name = "user_id", referencedColumnName = "id", unique = true)
     private User user;
 
