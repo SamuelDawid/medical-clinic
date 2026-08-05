@@ -63,7 +63,12 @@ public class AppointmentService {
         repository.save(appointment);
         return mapper.toDto(appointment);
     }
-
+    public void removePatientFromVisit(@NonNull Long appointmentId){
+        Appointment appointment = repository.findById(appointmentId)
+                .orElseThrow(AppointmentDoesNotExistsException::new);
+        appointment.setPatient(null);
+        repository.save(appointment);
+    }
     public AppointmentDto assignPatientToAppointment(@NonNull AssignPatientToAppointmentCommand command) {
         Appointment appointment = repository.findById(command.appointmentId())
                 .orElseThrow(AppointmentDoesNotExistsException::new);

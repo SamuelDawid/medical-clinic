@@ -63,7 +63,14 @@ public class AppointmentController {
     public AppointmentDto assignPatientToAppointment(@RequestBody AssignPatientToAppointmentCommand command) {
         return service.assignPatientToAppointment(command);
     }
-
+    @Operation(summary = "Remove Patient from Appointment")
+    @ApiResponse(description = "Appointment not found", responseCode = "404")
+    @ApiResponse(description = "Patient removed successfully", responseCode = "204")
+    @PatchMapping("/cancel/{appointmentId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void patientAppointmentCancel(@NonNull @PathVariable Long appointmentId){
+        service.removePatientFromVisit(appointmentId);
+    }
     @Operation(summary = "Delete Appointment")
     @ApiResponse(description = "Appointment deleted successfully", responseCode = "204")
     @ApiResponse(description = "Appointment not found", responseCode = "404")
