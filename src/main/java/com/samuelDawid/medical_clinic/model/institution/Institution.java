@@ -23,7 +23,9 @@ public class Institution {
     private Long id;
     @Column(unique = true)
     private String name;
-    @Embedded
+
+    @OneToOne(cascade = CascadeType.ALL,orphanRemoval = true)
+    @JoinColumn(name = "address_id",referencedColumnName = "id")
     private Address address;
 
     @ManyToMany(mappedBy = "institutions")
