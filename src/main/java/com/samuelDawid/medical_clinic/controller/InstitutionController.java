@@ -1,5 +1,6 @@
 package com.samuelDawid.medical_clinic.controller;
 
+import com.samuelDawid.medical_clinic.dto.PageDto;
 import com.samuelDawid.medical_clinic.dto.doctor.DoctorDto;
 import com.samuelDawid.medical_clinic.dto.institution.CreateInstitutionCommand;
 import com.samuelDawid.medical_clinic.dto.institution.InstitutionDoctorsDto;
@@ -11,10 +12,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Set;
 
 @Tag(name = "Institution", description = "Operations for managing institution records")
@@ -28,8 +31,8 @@ public class InstitutionController {
     @ApiResponse(description = "Get all Institutions", responseCode = "200")
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
-    public List<InstitutionDto> findAll() {
-        return service.findAll();
+    public PageDto<InstitutionDto> findAll(@ParameterObject @PageableDefault(size = 20, sort = "id") Pageable pageable) {
+        return service.findAll(pageable);
     }
 
     @Operation(summary = "Get by id")

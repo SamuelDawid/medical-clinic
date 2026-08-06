@@ -1,5 +1,6 @@
 package com.samuelDawid.medical_clinic.service;
 
+import com.samuelDawid.medical_clinic.dto.PageDto;
 import com.samuelDawid.medical_clinic.dto.doctor.DoctorDto;
 import com.samuelDawid.medical_clinic.dto.institution.CreateInstitutionCommand;
 import com.samuelDawid.medical_clinic.dto.institution.InstitutionDoctorsDto;
@@ -13,9 +14,9 @@ import com.samuelDawid.medical_clinic.repository.InstitutionRepository;
 import jakarta.transaction.Transactional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Set;
 
 @Service
@@ -25,10 +26,9 @@ public class InstitutionService {
     private final InstitutionMapper mapper;
     private final AffiliationService affiliationService;
 
-    public List<InstitutionDto> findAll() {
-        return repository.findAll().stream()
-                .map(mapper::toDto)
-                .toList();
+    public PageDto<InstitutionDto> findAll(Pageable pageable) {
+        return PageDto.from(repository.findAll(pageable)
+                .map(mapper::toDto));
     }
 
     public InstitutionDto findById(@NonNull Long id) {
@@ -39,7 +39,8 @@ public class InstitutionService {
 
     public InstitutionDto create(@NonNull CreateInstitutionCommand command) {
         Institution institution = mapper.toEntity(command);
-        if (repository.findByName(command.name()).isPresent()) {
+        if (repository.findByName(command.name())
+                .isPresent()) {
             throw new InstitutionAlreadyExistsException();
         }
         repository.save(institution);
