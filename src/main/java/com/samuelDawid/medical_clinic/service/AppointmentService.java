@@ -1,5 +1,6 @@
 package com.samuelDawid.medical_clinic.service;
 
+import com.samuelDawid.medical_clinic.dto.PageDto;
 import com.samuelDawid.medical_clinic.dto.appointment.AppointmentDto;
 import com.samuelDawid.medical_clinic.dto.appointment.AssignPatientToAppointmentCommand;
 import com.samuelDawid.medical_clinic.dto.appointment.CreateAppointmentCommand;
@@ -13,13 +14,13 @@ import com.samuelDawid.medical_clinic.repository.DoctorRepository;
 import com.samuelDawid.medical_clinic.repository.PatientRepository;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,18 +30,14 @@ public class AppointmentService {
     private final DoctorRepository doctorRepository;
     private final PatientRepository patientRepository;
 
-    public Set<AppointmentDto> findAll() {
-        return repository.findAll()
-                .stream()
-                .map(mapper::toDto)
-                .collect(Collectors.toSet());
+    public PageDto<AppointmentDto> findAll(Pageable pageable) {
+        return PageDto.from(repository.findAll(pageable)
+                .map(mapper::toDto));
     }
 
-    public Set<AppointmentDto> findAllByPatientId(@NonNull Long id) {
-        return repository.findAllByPatientId(id)
-                .stream()
-                .map(mapper::toDto)
-                .collect(Collectors.toSet());
+    public PageDto<AppointmentDto> findAllByPatientId(@NonNull Long id, Pageable pageable) {
+         return PageDto.from(repository.findAllByPatientId(id, pageable)
+                .map(mapper::toDto));
     }
 
     public AppointmentDto findById(@NonNull Long id) {
@@ -63,12 +60,14 @@ public class AppointmentService {
         repository.save(appointment);
         return mapper.toDto(appointment);
     }
-    public void removePatientFromVisit(@NonNull Long appointmentId){
+
+    public void removePatientFromVisit(@NonNull Long appointmentId) {
         Appointment appointment = repository.findById(appointmentId)
                 .orElseThrow(AppointmentDoesNotExistsException::new);
         appointment.setPatient(null);
         repository.save(appointment);
     }
+
     public AppointmentDto assignPatientToAppointment(@NonNull AssignPatientToAppointmentCommand command) {
         Appointment appointment = repository.findById(command.appointmentId())
                 .orElseThrow(AppointmentDoesNotExistsException::new);

@@ -1,5 +1,6 @@
 package com.samuelDawid.medical_clinic.controller;
 
+import com.samuelDawid.medical_clinic.dto.PageDto;
 import com.samuelDawid.medical_clinic.dto.appointment.AppointmentDto;
 import com.samuelDawid.medical_clinic.dto.appointment.AssignPatientToAppointmentCommand;
 import com.samuelDawid.medical_clinic.dto.appointment.CreateAppointmentCommand;
@@ -9,6 +10,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springdoc.core.converters.models.PageableAsQueryParam;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,8 +30,8 @@ public class AppointmentController {
     @Operation(summary = "Get all appointments")
     @ApiResponse(description = "Get all appointments", responseCode = "200")
     @GetMapping
-    public Set<AppointmentDto> findAll() {
-        return service.findAll();
+    public PageDto<AppointmentDto> findAll(@ParameterObject @PageableDefault(size = 20, sort = "id")Pageable pageable) {
+        return service.findAll(pageable);
     }
 
     @Operation(summary = "Get appointment by id")
@@ -39,8 +45,8 @@ public class AppointmentController {
     @Operation(summary = "Get appointments by Patient id")
     @ApiResponse(description = "appointments found", responseCode = "200")
     @GetMapping("/patient/{id}")
-    public Set<AppointmentDto> findAllByPatientId(@PathVariable @NonNull Long id) {
-        return service.findAllByPatientId(id);
+    public PageDto<AppointmentDto> findAllByPatientId(@PathVariable @NonNull Long id,@ParameterObject @PageableDefault(size = 20, sort = "id")Pageable pageable) {
+        return service.findAllByPatientId(id,pageable);
     }
 
     @Operation(summary = "Create appointment, patient does not need to be assigned")
