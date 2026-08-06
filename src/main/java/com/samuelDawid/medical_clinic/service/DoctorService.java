@@ -1,5 +1,6 @@
 package com.samuelDawid.medical_clinic.service;
 
+import com.samuelDawid.medical_clinic.dto.PageDto;
 import com.samuelDawid.medical_clinic.dto.doctor.CreateDoctorCommand;
 import com.samuelDawid.medical_clinic.dto.doctor.DoctorDto;
 import com.samuelDawid.medical_clinic.dto.doctor.PatchDoctorCommand;
@@ -14,6 +15,7 @@ import com.samuelDawid.medical_clinic.validators.EmailValidator;
 import jakarta.transaction.Transactional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,8 +31,9 @@ public class DoctorService {
     private final EmailValidator emailValidator;
 
 
-    public List<DoctorDto> findAll() {
-        return repository.findAll().stream().map(mapper::toDto).toList();
+    public PageDto<DoctorDto> findAll(Pageable pageable) {
+        return PageDto.from(repository.findAll(pageable)
+                .map(mapper::toDto));
     }
 
     public DoctorDto findById(@NonNull Long id) {
@@ -40,7 +43,8 @@ public class DoctorService {
     }
 
     public DoctorDto create(@NonNull CreateDoctorCommand command) {
-        String email = EmailValidator.normalize(command.user().email());
+        String email = EmailValidator.normalize(command.user()
+                .email());
         emailValidator.validate(email);
         validateEmailIsFree(email);
 
@@ -60,7 +64,8 @@ public class DoctorService {
     }
 
     public void delete(@NonNull Long id) {
-        Doctor doctor = repository.findById(id).orElseThrow(DoctorNotFoundException::new);
+        Doctor doctor = repository.findById(id)
+                .orElseThrow(DoctorNotFoundException::new);
         repository.delete(doctor);
     }
 
@@ -74,7 +79,8 @@ public class DoctorService {
     }
 
     private void validateEmailIsFree(String email) {
-        if (repository.findByUserEmail(email).isPresent()) {
+        if (repository.findByUserEmail(email)
+                .isPresent()) {
             throw new DoctorAlreadyExistsException();
         }
     }

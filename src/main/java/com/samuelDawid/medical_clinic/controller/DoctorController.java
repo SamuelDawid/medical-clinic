@@ -1,5 +1,6 @@
 package com.samuelDawid.medical_clinic.controller;
 
+import com.samuelDawid.medical_clinic.dto.PageDto;
 import com.samuelDawid.medical_clinic.dto.doctor.CreateDoctorCommand;
 import com.samuelDawid.medical_clinic.dto.doctor.DoctorDto;
 import com.samuelDawid.medical_clinic.dto.doctor.PatchDoctorCommand;
@@ -9,10 +10,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Tag(name = "Doctors", description = "Operations for managing doctors records")
 @RequestMapping("/doctors")
@@ -25,8 +27,8 @@ public class DoctorController {
     @ApiResponse(description = "Get all doctors", responseCode = "200")
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
-    public List<DoctorDto> findAll() {
-        return service.findAll();
+    public PageDto<DoctorDto> findAll(@ParameterObject @PageableDefault(size = 20, sort = "id") Pageable pageable) {
+        return service.findAll(pageable);
     }
 
     @Operation(summary = "Get by id")
