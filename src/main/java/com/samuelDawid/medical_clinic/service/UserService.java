@@ -1,6 +1,7 @@
 package com.samuelDawid.medical_clinic.service;
 
 import com.samuelDawid.medical_clinic.dto.ChangePasswordCommand;
+import com.samuelDawid.medical_clinic.dto.PageDto;
 import com.samuelDawid.medical_clinic.dto.user.CreateUserCommand;
 import com.samuelDawid.medical_clinic.dto.user.UserDto;
 import com.samuelDawid.medical_clinic.exceptions.InvalidPasswordException;
@@ -11,9 +12,8 @@ import com.samuelDawid.medical_clinic.model.User;
 import com.samuelDawid.medical_clinic.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @AllArgsConstructor
 @Service
@@ -21,20 +21,21 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    public List<UserDto> findAll() {
-        return userRepository.findAll().stream()
-                .map(userMapper::toDto)
-                .toList();
+    public PageDto<UserDto> findAll(Pageable pageable) {
+        return PageDto.from(userRepository.findAll(pageable)
+                .map(userMapper::toDto));
     }
 
     public UserDto create(@NonNull CreateUserCommand command) {
-        if (userRepository.findAll().stream()
+        if (userRepository.findAll()
+                .stream()
                 .map(User::getEmail)
                 .toList()
                 .contains(command.email())) {
             throw new UserAlreadyExistsException();
         }
-        if (command.password().isBlank()) {
+        if (command.password()
+                .isBlank()) {
             throw new InvalidPasswordException();
         }
         User user = userMapper.toEntity(command);
@@ -49,7 +50,8 @@ public class UserService {
     }
 
     public void changePassword(@NonNull Long id, @NonNull ChangePasswordCommand command) {
-        if (command.newPassword().isBlank()) {
+        if (command.newPassword()
+                .isBlank()) {
             throw new InvalidPasswordException();
         }
         User user = userRepository.findById(id)
