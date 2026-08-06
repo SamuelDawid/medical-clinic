@@ -1,5 +1,6 @@
 package com.samuelDawid.medical_clinic.service;
 
+import com.samuelDawid.medical_clinic.dto.PageDto;
 import com.samuelDawid.medical_clinic.dto.patient.CreatePatientCommand;
 import com.samuelDawid.medical_clinic.dto.patient.PatchPatientCommand;
 import com.samuelDawid.medical_clinic.dto.patient.PatientDto;
@@ -14,9 +15,8 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -27,10 +27,9 @@ public class PatientService {
     private final UserMapper userMapper;
     private final UserPatcher userPatcher;
 
-    public List<PatientDto> findAll() {
-        return repository.findAll().stream()
-                .map(patientMapper::toPatientDto)
-                .toList();
+    public PageDto<PatientDto> findAll(Pageable pageable) {
+        return PageDto.from(repository.findAll(pageable)
+                .map(patientMapper::toPatientDto));
     }
 
     public PatientDto findById(@NotNull Long id) {
@@ -40,11 +39,12 @@ public class PatientService {
     }
 
     public PatientDto addPatient(@NonNull CreatePatientCommand patientCommand) {
-        String emailNormalizer = EmailValidator.normalize(patientCommand.user().email());
+        String emailNormalizer = EmailValidator.normalize(patientCommand.user()
+                .email());
         emailValidator.validate(emailNormalizer);
         validateEmailIsFree(emailNormalizer);
 
-        Patient patient = patientBuilder(patientCommand,emailNormalizer);
+        Patient patient = patientBuilder(patientCommand, emailNormalizer);
 
         repository.save(patient);
         return patientMapper.toPatientDto(patient);
@@ -65,11 +65,12 @@ public class PatientService {
                 .orElseThrow(PatientWithIdNotFoundException::new);
         repository.delete(patientToDelete);
     }
+
     @Transactional
     public PatientDto updatePatient(@NonNull Long id, @NonNull PatchPatientCommand patientCommand) {
         Patient patient = repository.findById(id)
-                        .orElseThrow(PatientWithIdNotFoundException::new);
-        patient.update(patientCommand,userPatcher);
+                .orElseThrow(PatientWithIdNotFoundException::new);
+        patient.update(patientCommand, userPatcher);
         return patientMapper.toPatientDto(patient);
     }
 
@@ -79,15 +80,19 @@ public class PatientService {
         }
         Patient patientToUpdate = repository.findByUserEmail(EmailValidator.normalize(email))
                 .orElseThrow(() -> new PatientNotFoundException(email));
-        patientToUpdate.getUser().setPassword(newPassword);
+        patientToUpdate.getUser()
+                .setPassword(newPassword);
         repository.save(patientToUpdate);
     }
+
     private void validateEmailIsFree(String email) {
-        if(repository.findByUserEmail(email).isPresent()){
+        if (repository.findByUserEmail(email)
+                .isPresent()) {
             throw new PatientAlreadyExistsException(email);
         }
     }
-    private Patient patientBuilder(@NonNull CreatePatientCommand patientCommand,String email){
+
+    private Patient patientBuilder(@NonNull CreatePatientCommand patientCommand, String email) {
         Patient patient = patientMapper.toEntity(patientCommand);
         User user = userMapper.toEntity(patientCommand.user());
         user.setEmail(email);
