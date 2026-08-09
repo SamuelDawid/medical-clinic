@@ -17,9 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Set;
 
 @Service
@@ -36,7 +34,7 @@ public class AppointmentService {
     }
 
     public PageDto<AppointmentDto> findAllByPatientId(@NonNull Long id, Pageable pageable) {
-         return PageDto.from(repository.findAllByPatientId(id, pageable)
+        return PageDto.from(repository.findAllByPatientId(id, pageable)
                 .map(mapper::toDto));
     }
 
@@ -53,7 +51,7 @@ public class AppointmentService {
                 .orElseThrow(DoctorNotFoundException::new);
         appointment.setDoctor(doctor);
 
-        validateDate(appointment.getDate(), appointment.getStartTime());
+        validateDate(appointment.getStartDateTime());
         validateTimeOfTheVisit(appointment);
         assignPatientAtAppointmentCreation(command, appointment);
 
@@ -75,7 +73,7 @@ public class AppointmentService {
             throw new AppointmentAlreadyTakenException();
         }
 
-        validateDate(appointment.getDate(), appointment.getStartTime());
+        validateDate(appointment.getStartDateTime());
         Patient patient = patientRepository.findById(command.patientId())
                 .orElseThrow(PatientWithIdNotFoundException::new);
         appointment.setPatient(patient);
@@ -89,9 +87,8 @@ public class AppointmentService {
         repository.delete(appointment);
     }
 
-    private void validateDate(@NonNull LocalDate date, @NonNull LocalTime time) {
-        LocalDateTime appointment = LocalDateTime.of(date, time);
-        if (appointment.isBefore(LocalDateTime.now())) {
+    private void validateDate(@NonNull LocalDateTime dateAndTime) {
+        if (dateAndTime.isBefore(LocalDateTime.now())) {
             throw new InvalidDateOfAppointmentException();
         }
     }
@@ -105,16 +102,15 @@ public class AppointmentService {
     }
 
     private void validateTimeOfTheVisit(@NonNull Appointment appointmentToCreate) {
-        int minutes = appointmentToCreate.getStartTime()
+        int minutes = appointmentToCreate.getStartDateTime()
                 .getMinute();
         if (!validateMinutes(minutes)) {
             throw new InvalidTimeOfTheAppointmentException();
         }
-        Set<Appointment> appointments = repository.findByDoctorAndDateAndStartTimeLessThanAndEndTimeGreaterThan(
+        Set<Appointment> appointments = repository.findByDoctorAndStartDateTimeLessThanAndEndDateTimeGreaterThan(
                 appointmentToCreate.getDoctor(),
-                appointmentToCreate.getDate(),
-                appointmentToCreate.getEndTime(),
-                appointmentToCreate.getStartTime()
+                appointmentToCreate.getEndDateTime(),
+                appointmentToCreate.getStartDateTime()
         );
         if (!appointments.isEmpty()) {
             throw new TimeIsOverlappingWithAnotherAppointmentException();
