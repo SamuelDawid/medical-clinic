@@ -43,25 +43,14 @@ public class Doctor {
     }
 
     @Override
-    public final boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || effectiveClassOf(this) != effectiveClassOf(o)) {
-            return false;
-        }
-        Doctor other = (Doctor) o;
-        return getId() != null && Objects.equals(getId(), other.getId());
+    public boolean equals(Object o) {
+        if(this == o){ return true;}
+        if (!(o instanceof Doctor other)) return false;
+        return id != null && id.equals(other.getId());
     }
 
     @Override
-    public final int hashCode() {
-        return effectiveClassOf(this).hashCode();
-    }
-
-    private static Class<?> effectiveClassOf(Object entity) {
-        return entity instanceof HibernateProxy proxy
-                ? proxy.getHibernateLazyInitializer().getPersistentClass()
-                : entity.getClass();
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }
