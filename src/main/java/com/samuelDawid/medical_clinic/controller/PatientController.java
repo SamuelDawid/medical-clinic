@@ -73,22 +73,10 @@ public class PatientController {
             @ApiResponse(responseCode = "400", description = "Invalid password supplied"),
             @ApiResponse(responseCode = "404", description = "Patient not found")
     })
-    @PatchMapping("/{email}/password")
+    @PatchMapping("/{id}/password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void changePassword(@PathVariable String email, @RequestBody ChangePasswordCommand newPassword) {
-        patientService.updatePassword(newPassword.newPassword(), email);
-    }
-
-    @Operation(summary = "Delete Patient")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Patient Deleted Successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid email supplied"),
-            @ApiResponse(responseCode = "404", description = "Patient not found")
-    })
-    @DeleteMapping("/email/{email}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable String email) {
-        patientService.deleteByEmail(email);
+    public void changePassword(@PathVariable long id, @RequestBody ChangePasswordCommand newPassword) {
+        patientService.updatePassword(newPassword.newPassword(), id);
     }
 
     @Operation(summary = "Delete Patient")
