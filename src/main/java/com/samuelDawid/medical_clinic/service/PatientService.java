@@ -4,7 +4,10 @@ import com.samuelDawid.medical_clinic.dto.PageDto;
 import com.samuelDawid.medical_clinic.dto.patient.CreatePatientCommand;
 import com.samuelDawid.medical_clinic.dto.patient.PatchPatientCommand;
 import com.samuelDawid.medical_clinic.dto.patient.PatientDto;
-import com.samuelDawid.medical_clinic.exceptions.*;
+import com.samuelDawid.medical_clinic.exceptions.InvalidPasswordException;
+import com.samuelDawid.medical_clinic.exceptions.PatientAlreadyExistsException;
+import com.samuelDawid.medical_clinic.exceptions.PatientNotFoundException;
+import com.samuelDawid.medical_clinic.exceptions.PatientWithIdNotFoundException;
 import com.samuelDawid.medical_clinic.mappers.PatientMapper;
 import com.samuelDawid.medical_clinic.mappers.UserMapper;
 import com.samuelDawid.medical_clinic.model.Patient;
@@ -50,16 +53,6 @@ public class PatientService {
         return patientMapper.toPatientDto(patient);
     }
 
-    public void deleteByEmail(@NonNull String email) {
-        String emailNormalizer = EmailValidator.normalize(email);
-        if (!emailValidator.validate(emailNormalizer)) {
-            throw new InvalidEmailException(email);
-        }
-        Patient patientToDelete = repository.findByUserEmail(emailNormalizer)
-                .orElseThrow(() -> new PatientNotFoundException(email));
-        repository.delete(patientToDelete);
-    }
-
     public void deleteById(@NonNull Long id) {
         Patient patientToDelete = repository.findById(id)
                 .orElseThrow(PatientWithIdNotFoundException::new);
@@ -74,12 +67,12 @@ public class PatientService {
         return patientMapper.toPatientDto(patient);
     }
 
-    public void updatePassword(@NonNull String newPassword, @NonNull String email) {
+    public void updatePassword(@NonNull String newPassword, @NonNull Long id) {
         if (newPassword.isBlank()) {
             throw new InvalidPasswordException();
         }
-        Patient patientToUpdate = repository.findByUserEmail(EmailValidator.normalize(email))
-                .orElseThrow(() -> new PatientNotFoundException(email));
+        Patient patientToUpdate = repository.findById(id)
+                .orElseThrow(PatientNotFoundException::new);
         patientToUpdate.getUser()
                 .setPassword(newPassword);
         repository.save(patientToUpdate);
