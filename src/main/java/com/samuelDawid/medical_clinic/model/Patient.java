@@ -11,8 +11,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @ToString
-@AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "PATIENT")
 public class Patient {
     @Id
@@ -23,9 +22,17 @@ public class Patient {
     private LocalDate birthDay;
     private String phoneNumber;
 
-    @OneToOne(cascade = CascadeType.ALL, optional = false,orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
     @JoinColumn(name = "user_id", referencedColumnName = "id", unique = true)
+    @ToString.Exclude
     private User user;
+
+    public Patient(String idCardNo, LocalDate birthDay, String phoneNumber, User user) {
+        this.idCardNo = idCardNo;
+        this.birthDay = birthDay;
+        this.phoneNumber = phoneNumber;
+        this.user = user;
+    }
 
     public void update(@NonNull PatchPatientCommand patientCommand, UserPatcher userPatcher) {
         if (patientCommand.idCardNo() != null) {
@@ -41,9 +48,12 @@ public class Patient {
             userPatcher.apply(patientCommand.user(), this.getUser());
         }
     }
+
     @Override
     public boolean equals(Object o) {
-        if(this == o){ return true;}
+        if (this == o) {
+            return true;
+        }
         if (!(o instanceof Patient other)) return false;
         return id != null && id.equals(other.getId());
     }
