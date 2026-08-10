@@ -14,18 +14,19 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @AllArgsConstructor
 @Service
 public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-
+    @Transactional(readOnly = true)
     public PageDto<UserDto> findAll(Pageable pageable) {
         return PageDto.from(userRepository.findAll(pageable)
                 .map(userMapper::toDto));
     }
-
+    @Transactional
     public UserDto create(@NonNull CreateUserCommand command) {
         if (userRepository.findAll()
                 .stream()
@@ -42,13 +43,13 @@ public class UserService {
         userRepository.save(user);
         return userMapper.toDto(user);
     }
-
+    @Transactional(readOnly = true)
     public UserDto findById(@NonNull Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(UserNotFoundException::new);
         return userMapper.toDto(user);
     }
-
+    @Transactional
     public void changePassword(@NonNull Long id, @NonNull ChangePasswordCommand command) {
         if (command.newPassword()
                 .isBlank()) {
@@ -59,7 +60,7 @@ public class UserService {
         user.setPassword(command.newPassword());
         userRepository.save(user);
     }
-
+    @Transactional
     public void deleteUser(@NonNull Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(UserNotFoundException::new);

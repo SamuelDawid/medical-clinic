@@ -12,13 +12,11 @@ import com.samuelDawid.medical_clinic.model.Doctor;
 import com.samuelDawid.medical_clinic.model.User;
 import com.samuelDawid.medical_clinic.repository.DoctorRepository;
 import com.samuelDawid.medical_clinic.validators.EmailValidator;
-import jakarta.transaction.Transactional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -30,18 +28,18 @@ public class DoctorService {
     private final AffiliationService affiliationService;
     private final EmailValidator emailValidator;
 
-
+    @Transactional(readOnly = true)
     public PageDto<DoctorDto> findAll(Pageable pageable) {
         return PageDto.from(repository.findAll(pageable)
                 .map(mapper::toDto));
     }
-
+    @Transactional(readOnly = true)
     public DoctorDto findById(@NonNull Long id) {
         return repository.findById(id)
                 .map(mapper::toDto)
                 .orElseThrow(DoctorNotFoundException::new);
     }
-
+    @Transactional
     public DoctorDto create(@NonNull CreateDoctorCommand command) {
         String email = EmailValidator.normalize(command.user()
                 .email());
@@ -62,7 +60,7 @@ public class DoctorService {
         doctor.update(command, userPatcher);
         return mapper.toDto(doctor);
     }
-
+    @Transactional
     public void delete(@NonNull Long id) {
         Doctor doctor = repository.findById(id)
                 .orElseThrow(DoctorNotFoundException::new);

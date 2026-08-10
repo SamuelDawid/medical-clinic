@@ -14,12 +14,12 @@ import com.samuelDawid.medical_clinic.model.Patient;
 import com.samuelDawid.medical_clinic.model.User;
 import com.samuelDawid.medical_clinic.repository.PatientRepository;
 import com.samuelDawid.medical_clinic.validators.EmailValidator;
-import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -29,18 +29,18 @@ public class PatientService {
     private final PatientMapper patientMapper;
     private final UserMapper userMapper;
     private final UserPatcher userPatcher;
-
+    @Transactional(readOnly = true)
     public PageDto<PatientDto> findAll(Pageable pageable) {
         return PageDto.from(repository.findAll(pageable)
                 .map(patientMapper::toPatientDto));
     }
-
+    @Transactional(readOnly = true)
     public PatientDto findById(@NotNull Long id) {
         Patient patientToFind = repository.findById(id)
                 .orElseThrow(PatientWithIdNotFoundException::new);
         return patientMapper.toPatientDto(patientToFind);
     }
-
+    @Transactional
     public PatientDto addPatient(@NonNull CreatePatientCommand patientCommand) {
         String emailNormalizer = EmailValidator.normalize(patientCommand.user()
                 .email());
@@ -52,7 +52,7 @@ public class PatientService {
         repository.save(patient);
         return patientMapper.toPatientDto(patient);
     }
-
+    @Transactional
     public void deleteById(@NonNull Long id) {
         Patient patientToDelete = repository.findById(id)
                 .orElseThrow(PatientWithIdNotFoundException::new);
@@ -66,7 +66,7 @@ public class PatientService {
         patient.update(patientCommand, userPatcher);
         return patientMapper.toPatientDto(patient);
     }
-
+    @Transactional
     public void updatePassword(@NonNull String newPassword, @NonNull Long id) {
         if (newPassword.isBlank()) {
             throw new InvalidPasswordException();

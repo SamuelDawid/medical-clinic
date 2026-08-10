@@ -7,9 +7,9 @@ import com.samuelDawid.medical_clinic.model.Doctor;
 import com.samuelDawid.medical_clinic.model.institution.Institution;
 import com.samuelDawid.medical_clinic.repository.DoctorRepository;
 import com.samuelDawid.medical_clinic.repository.InstitutionRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -38,7 +38,6 @@ public class AffiliationService {
                 .flatMap(Optional::stream)
                 .collect(Collectors.toSet());
     }
-    @Transactional
     public InstitutionDoctorsDto assignInstitutionToDoctorsById(Set<Long> doctorsIds, Institution institution){
         Set<Doctor> doctors = resolveDoctors(doctorsIds);
         doctors.forEach(doctor -> doctor.getInstitutions().add(institution));
@@ -47,6 +46,7 @@ public class AffiliationService {
                 doctors.stream().map(doctorMapper::toSummaryDto)
                         .collect(Collectors.toSet()));
     }
+    @Transactional(readOnly = true)
     public Set<DoctorDto> showDoctorsByInstitution(Long institutionId){
         return doctorRepository.findByInstitutionsId(institutionId).stream()
                 .map(doctorMapper::toDto)

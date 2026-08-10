@@ -16,6 +16,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -27,27 +28,27 @@ public class AppointmentService {
     private final AppointmentMapper mapper;
     private final DoctorRepository doctorRepository;
     private final PatientRepository patientRepository;
-
+    @Transactional(readOnly = true)
     public PageDto<AppointmentDto> findAll(Pageable pageable) {
         return PageDto.from(repository.findAll(pageable)
                 .map(mapper::toDto));
     }
-
+    @Transactional(readOnly = true)
     public PageDto<AppointmentDto> findAllByPatientId(@NonNull Long id, Pageable pageable) {
         return PageDto.from(repository.findAllByPatientId(id, pageable)
                 .map(mapper::toDto));
     }
-
+    @Transactional(readOnly = true)
     public AppointmentDto findById(@NonNull Long id) {
         Appointment appointment = repository.findById(id)
                 .orElseThrow(AppointmentDoesNotExistsException::new);
         return mapper.toDto(appointment);
     }
-
+    @Transactional
     public AppointmentDto create(@NonNull CreateAppointmentCommand command) {
         Appointment appointment = mapper.toEntity(command);
 
-        Doctor doctor = doctorRepository.findById(command.doctorId())
+        Doctor doctor = doctorRepository.findByIdForUpdate(command.doctorId())
                 .orElseThrow(DoctorNotFoundException::new);
         appointment.setDoctor(doctor);
 
@@ -55,19 +56,17 @@ public class AppointmentService {
         validateTimeOfTheVisit(appointment);
         assignPatientAtAppointmentCreation(command, appointment);
 
-        repository.save(appointment);
         return mapper.toDto(appointment);
     }
-
+    @Transactional
     public void removePatientFromVisit(@NonNull Long appointmentId) {
         Appointment appointment = repository.findById(appointmentId)
                 .orElseThrow(AppointmentDoesNotExistsException::new);
         appointment.setPatient(null);
-        repository.save(appointment);
     }
-
+    @Transactional
     public AppointmentDto assignPatientToAppointment(@NonNull AssignPatientToAppointmentCommand command) {
-        Appointment appointment = repository.findById(command.appointmentId())
+        Appointment appointment = repository.findWithLockById(command.appointmentId())
                 .orElseThrow(AppointmentDoesNotExistsException::new);
         if (appointment.getPatient() != null) {
             throw new AppointmentAlreadyTakenException();
@@ -77,10 +76,9 @@ public class AppointmentService {
         Patient patient = patientRepository.findById(command.patientId())
                 .orElseThrow(PatientWithIdNotFoundException::new);
         appointment.setPatient(patient);
-        repository.save(appointment);
         return mapper.toDto(appointment);
     }
-
+    @Transactional
     public void delete(@NonNull Long appointmentId) {
         Appointment appointment = repository.findById(appointmentId)
                 .orElseThrow(AppointmentDoesNotExistsException::new);
