@@ -8,7 +8,7 @@ import java.util.Set;
 public record CreateInstitutionCommand(
         @Schema(description = "Name", example = "NewCare Clinic", requiredMode = Schema.RequiredMode.REQUIRED)
         String name,
-        @Schema(description = "List of doctors id")
+        @Schema(description = "List of doctors id",example = "[]")
         Set<Long> doctorsId,
         CreateAddressCommand address
 ) {

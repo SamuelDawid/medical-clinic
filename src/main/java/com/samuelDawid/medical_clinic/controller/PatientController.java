@@ -1,6 +1,7 @@
 package com.samuelDawid.medical_clinic.controller;
 
 import com.samuelDawid.medical_clinic.dto.ChangePasswordCommand;
+import com.samuelDawid.medical_clinic.dto.PageDto;
 import com.samuelDawid.medical_clinic.dto.patient.CreatePatientCommand;
 import com.samuelDawid.medical_clinic.dto.patient.PatchPatientCommand;
 import com.samuelDawid.medical_clinic.dto.patient.PatientDto;
@@ -10,6 +11,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,8 +29,8 @@ public class PatientController {
     @Operation(summary = "Get all available Patients")
     @ApiResponse(responseCode = "200", description = "Returned all patients")
     @GetMapping
-    public List<PatientDto> findAll() {
-        return patientService.findAll();
+    public PageDto<PatientDto> findAll(@ParameterObject @PageableDefault(size = 20, sort = "id") Pageable pageable) {
+        return patientService.findAll(pageable);
     }
 
     @Operation(summary = "Get patient by id")
@@ -69,22 +73,10 @@ public class PatientController {
             @ApiResponse(responseCode = "400", description = "Invalid password supplied"),
             @ApiResponse(responseCode = "404", description = "Patient not found")
     })
-    @PatchMapping("/{email}/password")
+    @PatchMapping("/{id}/password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void changePassword(@PathVariable String email, @RequestBody ChangePasswordCommand newPassword) {
-        patientService.updatePassword(newPassword.newPassword(), email);
-    }
-
-    @Operation(summary = "Delete Patient")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Patient Deleted Successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid email supplied"),
-            @ApiResponse(responseCode = "404", description = "Patient not found")
-    })
-    @DeleteMapping("/email/{email}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable String email) {
-        patientService.deleteByEmail(email);
+    public void changePassword(@PathVariable long id, @RequestBody ChangePasswordCommand newPassword) {
+        patientService.updatePassword(newPassword.newPassword(), id);
     }
 
     @Operation(summary = "Delete Patient")

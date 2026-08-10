@@ -3,16 +3,17 @@ package com.samuelDawid.medical_clinic.model.institution;
 import com.samuelDawid.medical_clinic.dto.institution.PatchInsitutionCommand;
 import com.samuelDawid.medical_clinic.model.Doctor;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
+import org.hibernate.proxy.HibernateProxy;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "INSTITUTION")
@@ -22,10 +23,13 @@ public class Institution {
     private Long id;
     @Column(unique = true)
     private String name;
-    @Embedded
+
+    @OneToOne(cascade = CascadeType.ALL,orphanRemoval = true)
+    @JoinColumn(name = "address_id",referencedColumnName = "id")
     private Address address;
 
     @ManyToMany(mappedBy = "institutions")
+    @ToString.Exclude
     private Set<Doctor> doctors = new HashSet<>();
 
     public void update(@NonNull PatchInsitutionCommand command) {
@@ -44,5 +48,28 @@ public class Institution {
         if (command.street() != null) {
             this.getAddress().setStreet(command.street());
         }
+    }
+
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || effectiveClassOf(this) != effectiveClassOf(o)) {
+            return false;
+        }
+        Institution other = (Institution) o;
+        return getId() != null && Objects.equals(getId(), other.getId());
+    }
+
+    @Override
+    public final int hashCode() {
+        return effectiveClassOf(this).hashCode();
+    }
+
+    private static Class<?> effectiveClassOf(Object entity) {
+        return entity instanceof HibernateProxy proxy
+                ? proxy.getHibernateLazyInitializer().getPersistentClass()
+                : entity.getClass();
     }
 }

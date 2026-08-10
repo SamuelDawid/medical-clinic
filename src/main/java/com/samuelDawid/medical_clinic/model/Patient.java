@@ -3,15 +3,14 @@ package com.samuelDawid.medical_clinic.model;
 import com.samuelDawid.medical_clinic.dto.patient.PatchPatientCommand;
 import com.samuelDawid.medical_clinic.service.UserPatcher;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 
 import java.time.LocalDate;
 
 @Entity
-@Data
+@Getter
+@Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "PATIENT")
@@ -24,7 +23,7 @@ public class Patient {
     private LocalDate birthDay;
     private String phoneNumber;
 
-    @OneToOne(cascade = CascadeType.ALL, optional = false)
+    @OneToOne(cascade = CascadeType.ALL, optional = false,orphanRemoval = true)
     @JoinColumn(name = "user_id", referencedColumnName = "id", unique = true)
     private User user;
 
@@ -41,5 +40,16 @@ public class Patient {
         if (patientCommand.user() != null) {
             userPatcher.apply(patientCommand.user(), this.getUser());
         }
+    }
+    @Override
+    public boolean equals(Object o) {
+        if(this == o){ return true;}
+        if (!(o instanceof Patient other)) return false;
+        return id != null && id.equals(other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }

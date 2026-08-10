@@ -1,6 +1,7 @@
 package com.samuelDawid.medical_clinic.controller;
 
 import com.samuelDawid.medical_clinic.dto.ChangePasswordCommand;
+import com.samuelDawid.medical_clinic.dto.PageDto;
 import com.samuelDawid.medical_clinic.dto.user.CreateUserCommand;
 import com.samuelDawid.medical_clinic.dto.user.UserDto;
 import com.samuelDawid.medical_clinic.service.UserService;
@@ -10,10 +11,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -26,8 +28,8 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "Return all users")
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
-    public List<UserDto> findAll() {
-        return userService.findAll();
+    public PageDto<UserDto> findAll(@ParameterObject @PageableDefault(size = 20, sort = "id") Pageable pageable) {
+        return userService.findAll(pageable);
     }
 
     @Operation(description = "Get User By Id")
