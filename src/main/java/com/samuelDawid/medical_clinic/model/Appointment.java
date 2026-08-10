@@ -9,8 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Appointment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,15 +17,22 @@ public class Appointment {
     private LocalDateTime startDateTime;
     private LocalDateTime endDateTime;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patient_id")
     @ToString.Exclude
     private Patient patient;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "doctor_id")
     @ToString.Exclude
     private Doctor doctor;
+
+    public Appointment(LocalDateTime startDateTime, LocalDateTime endDateTime, Patient patient, Doctor doctor) {
+        this.startDateTime = startDateTime;
+        this.endDateTime = endDateTime;
+        this.patient = patient;
+        this.doctor = doctor;
+    }
 
     @Override
     public boolean equals(Object o){
