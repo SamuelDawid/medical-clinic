@@ -11,14 +11,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springdoc.core.converters.models.PageableAsQueryParam;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Set;
 
 @Tag(name = "Appointments", description = "Operations for managing Appointments records")
 @RequiredArgsConstructor
@@ -30,7 +26,7 @@ public class AppointmentController {
     @Operation(summary = "Get all appointments")
     @ApiResponse(description = "Get all appointments", responseCode = "200")
     @GetMapping
-    public PageDto<AppointmentDto> findAll(@ParameterObject @PageableDefault(size = 20, sort = "id")Pageable pageable) {
+    public PageDto<AppointmentDto> findAll(@ParameterObject @PageableDefault(size = 20, sort = "id") Pageable pageable) {
         return service.findAll(pageable);
     }
 
@@ -45,8 +41,8 @@ public class AppointmentController {
     @Operation(summary = "Get appointments by Patient id")
     @ApiResponse(description = "appointments found", responseCode = "200")
     @GetMapping("/patient/{id}")
-    public PageDto<AppointmentDto> findAllByPatientId(@PathVariable @NonNull Long id,@ParameterObject @PageableDefault(size = 20, sort = "id")Pageable pageable) {
-        return service.findAllByPatientId(id,pageable);
+    public PageDto<AppointmentDto> findAllByPatientId(@PathVariable @NonNull Long id, @ParameterObject @PageableDefault(size = 20, sort = "id") Pageable pageable) {
+        return service.findAllByPatientId(id, pageable);
     }
 
     @Operation(summary = "Create appointment, patient does not need to be assigned")
@@ -69,14 +65,16 @@ public class AppointmentController {
     public AppointmentDto assignPatientToAppointment(@RequestBody AssignPatientToAppointmentCommand command) {
         return service.assignPatientToAppointment(command);
     }
+
     @Operation(summary = "Remove Patient from Appointment")
     @ApiResponse(description = "Appointment not found", responseCode = "404")
     @ApiResponse(description = "Patient removed successfully", responseCode = "204")
     @PatchMapping("/cancel/{appointmentId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void patientAppointmentCancel(@NonNull @PathVariable Long appointmentId){
+    public void patientAppointmentCancel(@NonNull @PathVariable Long appointmentId) {
         service.removePatientFromVisit(appointmentId);
     }
+
     @Operation(summary = "Delete Appointment")
     @ApiResponse(description = "Appointment deleted successfully", responseCode = "204")
     @ApiResponse(description = "Appointment not found", responseCode = "404")

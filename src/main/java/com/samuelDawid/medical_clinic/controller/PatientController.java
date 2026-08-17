@@ -17,8 +17,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @Tag(name = "Patients", description = "Operations for managing patient records")
 @RequestMapping("/patients")
 @RestController

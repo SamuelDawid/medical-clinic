@@ -15,7 +15,6 @@ public interface AppointmentMapper {
     AppointmentDto toDto(Appointment appointment);
     default String fullName(User user){
         if(user == null){ return  null;}
-
         return user.getFirstName() + " " + user.getLastName();
     }
 }
