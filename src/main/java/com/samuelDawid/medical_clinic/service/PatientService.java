@@ -17,10 +17,11 @@ import com.samuelDawid.medical_clinic.validators.EmailValidator;
 import jakarta.validation.constraints.NotNull;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class PatientService {
@@ -41,33 +42,41 @@ public class PatientService {
         return patientMapper.toPatientDto(patientToFind);
     }
     @Transactional
-    public PatientDto addPatient(@NonNull CreatePatientCommand patientCommand) {
+    public PatientDto create(@NonNull CreatePatientCommand patientCommand) {
+        log.info("Starting creation of the patient");
         String emailNormalizer = EmailValidator.normalize(patientCommand.user()
                 .email());
+        log.debug("Email normalized: {} -> {}",patientCommand.user().email(),emailNormalizer);
         emailValidator.validate(emailNormalizer);
         validateEmailIsFree(emailNormalizer);
 
         Patient patient = patientBuilder(patientCommand, emailNormalizer);
 
         repository.save(patient);
+        log.info("Created Patient with id {}",patient.getId());
         return patientMapper.toPatientDto(patient);
     }
     @Transactional
     public void deleteById(@NonNull Long id) {
+        log.info("Delete patient started");
         Patient patientToDelete = repository.findById(id)
                 .orElseThrow(PatientWithIdNotFoundException::new);
         repository.delete(patientToDelete);
+        log.info("Successfully deleted patient with id {}",id);
     }
 
     @Transactional
     public PatientDto updatePatient(@NonNull Long id, @NonNull PatchPatientCommand patientCommand) {
+        log.info("Updating patient started");
         Patient patient = repository.findById(id)
                 .orElseThrow(PatientWithIdNotFoundException::new);
         patient.update(patientCommand, userPatcher);
+        log.info("Patient updated successfully");
         return patientMapper.toPatientDto(patient);
     }
     @Transactional
     public void updatePassword(@NonNull String newPassword, @NonNull Long id) {
+        log.info("Updating patient password");
         if (newPassword.isBlank()) {
             throw new InvalidPasswordException();
         }
@@ -75,7 +84,7 @@ public class PatientService {
                 .orElseThrow(PatientNotFoundException::new);
         patientToUpdate.getUser()
                 .setPassword(newPassword);
-        repository.save(patientToUpdate);
+        log.info("Password updated");
     }
 
     private void validateEmailIsFree(String email) {
