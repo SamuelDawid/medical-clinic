@@ -14,13 +14,14 @@ import com.samuelDawid.medical_clinic.repository.DoctorRepository;
 import com.samuelDawid.medical_clinic.repository.PatientRepository;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Set;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AppointmentService {
@@ -46,6 +47,8 @@ public class AppointmentService {
     }
     @Transactional
     public AppointmentDto create(@NonNull CreateAppointmentCommand command) {
+        log.info("Creating appointment with doctor Id {} and patient Id {} with date {} to {}",
+                command.doctorId(),command.patientId(),command.startDateTime(),command.endDateTime());
         Appointment appointment = mapper.toEntity(command);
 
         Doctor doctor = doctorRepository.findByIdForUpdate(command.doctorId())
@@ -55,17 +58,21 @@ public class AppointmentService {
         validateDate(appointment.getStartDateTime());
         validateTimeOfTheVisit(appointment);
         assignPatientAtAppointmentCreation(command, appointment);
-
+        repository.save(appointment);
+        log.info("Appointment with Id {} Created",appointment.getId());
         return mapper.toDto(appointment);
     }
     @Transactional
     public void removePatientFromVisit(@NonNull Long appointmentId) {
+        log.info("Removing Patient from Visit with Id {}",appointmentId);
         Appointment appointment = repository.findById(appointmentId)
                 .orElseThrow(AppointmentDoesNotExistsException::new);
         appointment.setPatient(null);
+        log.info("Patient removed successfully from visit with Id {} ",appointmentId);
     }
     @Transactional
     public AppointmentDto assignPatientToAppointment(@NonNull AssignPatientToAppointmentCommand command) {
+        log.info("Assigning Patient with Id {} To Appointment with Id {}",command.patientId(),command.appointmentId());
         Appointment appointment = repository.findWithLockById(command.appointmentId())
                 .orElseThrow(AppointmentDoesNotExistsException::new);
         if (appointment.getPatient() != null) {
@@ -76,16 +83,20 @@ public class AppointmentService {
         Patient patient = patientRepository.findById(command.patientId())
                 .orElseThrow(PatientWithIdNotFoundException::new);
         appointment.setPatient(patient);
+        log.info("Patient with Id {} assigned successfully to visit with Id {}",command.patientId(),command.appointmentId());
         return mapper.toDto(appointment);
     }
     @Transactional
     public void delete(@NonNull Long appointmentId) {
+        log.info("Deleting appointment with id {}",appointmentId);
         Appointment appointment = repository.findById(appointmentId)
                 .orElseThrow(AppointmentDoesNotExistsException::new);
         repository.delete(appointment);
+        log.info("Appointment {} deleted successfully",appointmentId);
     }
 
     private void validateDate(@NonNull LocalDateTime dateAndTime) {
+        log.debug("Checking if time is correct {}",dateAndTime);
         if (dateAndTime.isBefore(LocalDateTime.now())) {
             throw new InvalidDateOfAppointmentException();
         }
@@ -100,6 +111,8 @@ public class AppointmentService {
     }
 
     private void validateTimeOfTheVisit(@NonNull Appointment appointmentToCreate) {
+        log.debug("Checking overlaps for doctor {} between {} and {}",
+                appointmentToCreate.getDoctor().getId(),appointmentToCreate.getStartDateTime(),appointmentToCreate.getEndDateTime());
         int minutes = appointmentToCreate.getStartDateTime()
                 .getMinute();
         if (!validateMinutes(minutes)) {
@@ -110,6 +123,7 @@ public class AppointmentService {
                 appointmentToCreate.getEndDateTime(),
                 appointmentToCreate.getStartDateTime()
         );
+        log.debug("Found {} overlapping appointments",appointments.size());
         if (!appointments.isEmpty()) {
             throw new TimeIsOverlappingWithAnotherAppointmentException();
         }
