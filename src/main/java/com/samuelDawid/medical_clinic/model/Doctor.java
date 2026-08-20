@@ -13,6 +13,7 @@ import java.util.Set;
 @Setter
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "DOCTOR")
 public class Doctor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

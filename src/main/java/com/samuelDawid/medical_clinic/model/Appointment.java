@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "APPOINTMENT")
 public class Appointment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
