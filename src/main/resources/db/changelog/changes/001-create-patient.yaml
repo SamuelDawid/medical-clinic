@@ -1,0 +1,55 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-patient
+      author: Samuel Dawid
+      comment: "Patient Table"
+      changes:
+        - createTable:
+            tableName: patient
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_patients
+              - column:
+                  name: id_card_no
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: birth_day
+                  type: DATE
+              - column:
+                  name: phone_number
+                  type: VARCHAR(255)
+              - column:
+                  name: first_name
+                  type: VARCHAR(255)
+              - column:
+                  name: last_name
+                  type: VARCHAR(255)
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: password
+                  type: VARCHAR(255)
+
+  - changeSet:
+      id: 001-add-patient-unique-constraints
+      author: Samuel Dawid
+      comment: "Unique constraints for patient"
+      changes:
+          - addUniqueConstraint:
+              tableName: patient
+              columnNames: id_card_no
+              constraintName: uq_patient_id_card_no
+          - addUniqueConstraint:
+              tableName: patient
+              columnNames: email
+              constraintName: uq_patient_email
