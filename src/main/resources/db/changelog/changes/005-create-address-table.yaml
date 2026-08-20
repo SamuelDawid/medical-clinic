@@ -1,0 +1,21 @@
+databaseChangeLog:
+  - changeSet:
+      id: 005-create-address-table
+      author: Samuel Dawid
+      comment: "Creating Table for address"
+      changes:
+        - createTable:
+            tableName: address
+            columns:
+              - column:
+                  name: city
+                  type: VARCHAR(255)
+              - column:
+                  name: post_code
+                  type: VARCHAR(255)
+              - column:
+                  name: street
+                  type: VARCHAR(255)
+              - column:
+                  name: building_number
+                  type: VARCHAR(60)
