@@ -1,0 +1,140 @@
+databaseChangeLog:
+  - changeSet:
+      id: 004-add-user-id-columns
+      author: Samuel Dawid
+      comment: "Add nullable user_id to patient and doctor"
+      changes:
+        - addColumn:
+            tableName: patient
+            columns:
+              - column:
+                  name: user_id
+                  type: BIGINT
+        - addColumn:
+            tableName: doctor
+            columns:
+              - column:
+                  name: user_id
+                  type: BIGINT
+
+  - changeSet:
+      id: 004.1-migrate-user-data
+      author: Samuel Dawid
+      comment: "Copy personal data from patient and doctor into users"
+      changes:
+        - sql:
+            sql: >
+              INSERT INTO users (first_name, last_name, email, password)
+              SELECT first_name, last_name, email, password FROM patient
+        - sql:
+            sql: >
+              UPDATE patient
+              SET user_id = (SELECT u.id FROM users u WHERE u.email = patient.email)
+        - sql:
+            sql: >
+              INSERT INTO users (first_name, last_name, email, password)
+              SELECT first_name, last_name, email, password FROM doctor
+        - sql:
+            sql: >
+              UPDATE doctor
+              SET user_id = (SELECT u.id FROM users u WHERE u.email = doctor.email)
+      rollback:
+        - sql:
+            sql: UPDATE patient SET user_id = NULL
+        - sql:
+            sql: UPDATE doctor SET user_id = NULL
+        - sql:
+            sql: DELETE FROM users
+
+  - changeSet:
+      id: 004.2-add-user-id-constraints
+      author: Samuel Dawid
+      comment: "Add constraints to user_id and link both tables"
+      changes:
+        - addNotNullConstraint:
+            tableName: patient
+            columnName: user_id
+            columnDataType: BIGINT
+        - addNotNullConstraint:
+            tableName: doctor
+            columnName: user_id
+            columnDataType: BIGINT
+        - addUniqueConstraint:
+            tableName: patient
+            columnNames: user_id
+            constraintName: uq_patient_user_id
+        - addUniqueConstraint:
+            tableName: doctor
+            columnNames: user_id
+            constraintName: uq_doctor_user_id
+        - addForeignKeyConstraint:
+            constraintName: fk_patient_user
+            baseTableName: patient
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            constraintName: fk_doctor_user
+            baseTableName: doctor
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+
+  - changeSet:
+      id: 004.3-drop-user-columns
+      author: Samuel Dawid
+      comment: "Remove personal data columns now owned by users"
+      changes:
+        - dropColumn:
+            tableName: patient
+            columns:
+              - column:
+                  name: first_name
+              - column:
+                  name: last_name
+              - column:
+                  name: email
+              - column:
+                  name: password
+        - dropColumn:
+            tableName: doctor
+            columns:
+              - column:
+                  name: first_name
+              - column:
+                  name: last_name
+              - column:
+                  name: email
+              - column:
+                  name: password
+      rollback:
+        - addColumn:
+            tableName: patient
+            columns:
+              - column:
+                  name: first_name
+                  type: VARCHAR(255)
+              - column:
+                  name: last_name
+                  type: VARCHAR(255)
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+              - column:
+                  name: password
+                  type: VARCHAR(255)
+        - addColumn:
+            tableName: doctor
+            columns:
+              - column:
+                  name: first_name
+                  type: VARCHAR(255)
+              - column:
+                  name: last_name
+                  type: VARCHAR(255)
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+              - column:
+                  name: password
+                  type: VARCHAR(255)
