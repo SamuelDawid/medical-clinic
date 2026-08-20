@@ -52,7 +52,7 @@ public class AppointmentService {
         Appointment appointment = mapper.toEntity(command);
 
         Doctor doctor = doctorRepository.findByIdForUpdate(command.doctorId())
-                .orElseThrow(DoctorNotFoundException::new);
+                .orElseThrow(() -> new DoctorNotFoundException(command.doctorId()));
         appointment.setDoctor(doctor);
 
         validateDate(appointment.getStartDateTime());

@@ -4,15 +4,13 @@ import com.samuelDawid.medical_clinic.dto.PageDto;
 import com.samuelDawid.medical_clinic.dto.patient.CreatePatientCommand;
 import com.samuelDawid.medical_clinic.dto.patient.PatchPatientCommand;
 import com.samuelDawid.medical_clinic.dto.patient.PatientDto;
-import com.samuelDawid.medical_clinic.exceptions.InvalidPasswordException;
-import com.samuelDawid.medical_clinic.exceptions.PatientAlreadyExistsException;
-import com.samuelDawid.medical_clinic.exceptions.PatientNotFoundException;
-import com.samuelDawid.medical_clinic.exceptions.PatientWithIdNotFoundException;
+import com.samuelDawid.medical_clinic.exceptions.*;
 import com.samuelDawid.medical_clinic.mappers.PatientMapper;
 import com.samuelDawid.medical_clinic.mappers.UserMapper;
 import com.samuelDawid.medical_clinic.model.Patient;
 import com.samuelDawid.medical_clinic.model.User;
 import com.samuelDawid.medical_clinic.repository.PatientRepository;
+import com.samuelDawid.medical_clinic.repository.UserRepository;
 import com.samuelDawid.medical_clinic.validators.EmailValidator;
 import jakarta.validation.constraints.NotNull;
 import lombok.NonNull;
@@ -26,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class PatientService {
     private final PatientRepository repository;
+    private final UserRepository userRepository;
     private final EmailValidator emailValidator;
     private final PatientMapper patientMapper;
     private final UserMapper userMapper;
@@ -47,8 +46,7 @@ public class PatientService {
         String emailNormalizer = EmailValidator.normalize(patientCommand.user()
                 .email());
         log.debug("Email normalized: {} -> {}",patientCommand.user().email(),emailNormalizer);
-        emailValidator.validate(emailNormalizer);
-        validateEmailIsFree(emailNormalizer);
+        validateEmail(emailNormalizer);
 
         Patient patient = patientBuilder(patientCommand, emailNormalizer);
 
@@ -87,9 +85,11 @@ public class PatientService {
         log.info("Password updated");
     }
 
-    private void validateEmailIsFree(String email) {
-        if (repository.findByUserEmail(email)
-                .isPresent()) {
+    private void validateEmail(String email) {
+        if(!emailValidator.validate(email)){
+            throw new InvalidEmailException(email);
+        }
+        if (userRepository.existsByEmail(email)) {
             throw new PatientAlreadyExistsException(email);
         }
     }

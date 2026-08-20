@@ -50,7 +50,7 @@ public class PatientController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public PatientDto create(@RequestBody CreatePatientCommand createDto) {
-        return patientService.addPatient(createDto);
+        return patientService.create(createDto);
     }
 
     @Operation(summary = "Updates Patient Details")
