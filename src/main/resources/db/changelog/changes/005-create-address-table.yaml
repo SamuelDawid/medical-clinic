@@ -8,6 +8,13 @@ databaseChangeLog:
             tableName: address
             columns:
               - column:
+                    name: id
+                    type: BIGINT
+                    autoIncrement: true
+                    constraints:
+                      primaryKey: true
+                      primaryKeyName: pk_address
+              - column:
                   name: city
                   type: VARCHAR(255)
               - column:
