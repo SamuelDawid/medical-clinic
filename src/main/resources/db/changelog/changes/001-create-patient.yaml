@@ -41,7 +41,7 @@ databaseChangeLog:
                   type: VARCHAR(255)
 
   - changeSet:
-      id: 001-add-patient-unique-constraints
+      id: 001.1-add-patient-unique-constraints
       author: Samuel Dawid
       comment: "Unique constraints for patient"
       changes:

@@ -47,32 +47,38 @@ databaseChangeLog:
             sql: DELETE FROM users
 
   - changeSet:
-      id: 004.2-add-user-id-constraints
+      id: 004.2-add-user-id-constraints-patient
       author: Samuel Dawid
-      comment: "Add constraints to user_id and link both tables"
+      comment: "Add constraints to user_id to patient table"
       changes:
         - addNotNullConstraint:
             tableName: patient
-            columnName: user_id
-            columnDataType: BIGINT
-        - addNotNullConstraint:
-            tableName: doctor
             columnName: user_id
             columnDataType: BIGINT
         - addUniqueConstraint:
             tableName: patient
             columnNames: user_id
             constraintName: uq_patient_user_id
-        - addUniqueConstraint:
-            tableName: doctor
-            columnNames: user_id
-            constraintName: uq_doctor_user_id
         - addForeignKeyConstraint:
             constraintName: fk_patient_user
             baseTableName: patient
             baseColumnNames: user_id
             referencedTableName: users
             referencedColumnNames: id
+
+  - changeSet:
+      id: 004.3-add-user-id-constraints-doctor
+      author: Samuel Dawid
+      comment: "Add constraints to user_id to doctor table"
+      changes:
+        - addNotNullConstraint:
+            tableName: doctor
+            columnName: user_id
+            columnDataType: BIGINT
+        - addUniqueConstraint:
+            tableName: doctor
+            columnNames: user_id
+            constraintName: uq_doctor_user_id
         - addForeignKeyConstraint:
             constraintName: fk_doctor_user
             baseTableName: doctor
@@ -81,7 +87,7 @@ databaseChangeLog:
             referencedColumnNames: id
 
   - changeSet:
-      id: 004.3-drop-user-columns
+      id: 004.4-drop-user-columns
       author: Samuel Dawid
       comment: "Remove personal data columns now owned by users"
       changes:
