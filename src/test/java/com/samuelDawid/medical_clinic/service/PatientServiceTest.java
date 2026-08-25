@@ -12,6 +12,7 @@ import com.samuelDawid.medical_clinic.exceptions.PatientWithIdNotFoundException;
 import com.samuelDawid.medical_clinic.mappers.PatientMapper;
 import com.samuelDawid.medical_clinic.mappers.UserMapper;
 import com.samuelDawid.medical_clinic.model.Patient;
+import com.samuelDawid.medical_clinic.model.TestDataFactory;
 import com.samuelDawid.medical_clinic.model.User;
 import com.samuelDawid.medical_clinic.repository.PatientRepository;
 import com.samuelDawid.medical_clinic.repository.UserRepository;
@@ -56,7 +57,7 @@ class PatientServiceTest {
         this.userMapper = Mappers.getMapper(UserMapper.class);
         this.userPatcher = new UserPatcher();
         this.patientService = new PatientService(repository, userRepository, emailValidator, patientMapper, userMapper, userPatcher);
-        seedData = buildSeedData();
+        seedData = TestDataFactory.threePatients();
     }
 
     @Test
@@ -223,11 +224,11 @@ class PatientServiceTest {
         //Given
         String newPassword = "newPassword123";
         Long existingId = 2L;
-        User testPassword = buildUser(3L, "Maria",
+        User testPassword = TestDataFactory.buildUser(3L, "Maria",
                 "Wisniewska",
                 "maria.wisniewska@test.pl",
                 "testUser3");
-        Patient patient = buildPatient(2L, "cardTest", LocalDate.of(1995, 3, 1), "123123", testPassword);
+        Patient patient = TestDataFactory.buildPatient(2L, "cardTest", LocalDate.of(1995, 3, 1), "123123", testPassword);
         when(repository.findById(existingId)).thenReturn(Optional.of(patient));
         //When
         patientService.updatePassword(newPassword, existingId);
@@ -235,40 +236,4 @@ class PatientServiceTest {
         verify(repository).findById(existingId);
         assertEquals("newPassword123", patient.getUser().getPassword());
     }
-
-
-    private Patient buildPatient(Long id, String idCardNo, LocalDate birthDay, String phoneNumber, User user) {
-        Patient patient = new Patient(idCardNo, birthDay, phoneNumber, user);
-        ReflectionTestUtils.setField(patient, "id", id);
-        return patient;
-    }
-
-    private User buildUser(Long id, String firstName, String lastName, String email, String password) {
-        User user = new User(firstName, lastName, email, password);
-        String normalizedEmail = EmailValidator.normalize(email);
-        user.setEmail(normalizedEmail);
-        ReflectionTestUtils.setField(user, "id", id);
-        return user;
-    }
-
-    private List<Patient> buildSeedData() {
-        User testUser1 = buildUser(1L, "Anna",
-                "Kowalska",
-                "anna.kowalska@test.pl",
-                "testUser1");
-        User testUser2 = buildUser(2L, "Piotr",
-                "Nowak",
-                "piotr.nowak@test.pl",
-                "testUser2");
-        User testUser3 = buildUser(3L, "Maria",
-                "Wisniewska",
-                "maria.wisniewska@test.pl",
-                "testUser3");
-        Patient test1 = buildPatient(1L, "ABC111111", LocalDate.of(1990, 3, 15), "500100200", testUser1);
-        Patient test2 = buildPatient(2L, "ABC222222", LocalDate.of(1985, 7, 22), "500300400", testUser2);
-        Patient test3 = buildPatient(3L, "ABC333333", LocalDate.of(2001, 11, 8), "500500600", testUser3);
-
-        return List.of(test1, test2, test3);
-    }
-
 }
