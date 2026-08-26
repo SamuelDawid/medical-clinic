@@ -40,7 +40,10 @@ public class PatientService {
     @Transactional(readOnly = true)
     public PatientDto findById(@NotNull Long id) {
         Patient patientToFind = repository.findById(id)
-                .orElseThrow(PatientWithIdNotFoundException::new);
+                .orElseThrow(() -> {
+                    log.warn("Patient with id {} not found",id);
+                    return new PatientWithIdNotFoundException();
+                });
         return patientMapper.toPatientDto(patientToFind);
     }
 
@@ -64,7 +67,10 @@ public class PatientService {
     public void deleteById(@NonNull Long id) {
         log.info("Delete patient started");
         Patient patientToDelete = repository.findById(id)
-                .orElseThrow(PatientWithIdNotFoundException::new);
+                .orElseThrow(() -> {
+                    log.warn("Deleting patient with id {} failed, patient not found",id);
+                    return new PatientWithIdNotFoundException();
+                });
         repository.delete(patientToDelete);
         log.info("Successfully deleted patient with id {}", id);
     }
@@ -73,7 +79,10 @@ public class PatientService {
     public PatientDto updatePatient(@NonNull Long id, @NonNull PatchPatientCommand patientCommand) {
         log.info("Updating patient started");
         Patient patient = repository.findById(id)
-                .orElseThrow(PatientWithIdNotFoundException::new);
+                .orElseThrow(() ->{
+                    log.warn("Updating patient with id {} failed, patient not found",id);
+                    return new PatientWithIdNotFoundException();
+                });
         patient.update(patientCommand, userPatcher);
         log.info("Patient updated successfully");
         return patientMapper.toPatientDto(patient);
@@ -83,10 +92,14 @@ public class PatientService {
     public void updatePassword(@NonNull String newPassword, @NonNull Long id) {
         log.info("Updating patient password");
         if (newPassword.isBlank()) {
+            log.warn("blank or null password");
             throw new InvalidPasswordException();
         }
         Patient patientToUpdate = repository.findById(id)
-                .orElseThrow(PatientNotFoundException::new);
+                .orElseThrow(() -> {
+                    log.warn("Updating patient with id {} failed, not found",id);
+                    return new PatientWithIdNotFoundException();
+                });
         patientToUpdate.getUser()
                 .setPassword(newPassword);
         log.info("Password updated");
@@ -94,9 +107,11 @@ public class PatientService {
 
     private void validateEmail(String email) {
         if (!emailValidator.validate(email)) {
+            log.warn("email : {} not a valid email",email);
             throw new InvalidEmailException(email);
         }
         if (userRepository.existsByEmail(email)) {
+            log.warn("user with email {} already exists",email);
             throw new PatientAlreadyExistsException(email);
         }
     }
