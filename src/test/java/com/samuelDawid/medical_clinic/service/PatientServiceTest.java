@@ -27,7 +27,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -134,7 +133,6 @@ class PatientServiceTest {
         verify(repository).save(captor.capture());
         Patient savedpatient = captor.getValue();
         Assertions.assertAll(
-                () -> assertInstanceOf(Patient.class, savedpatient),
                 () -> assertEquals(LocalDate.of(2001, 11, 8), result.birthDay()),
                 () -> assertEquals("500500600", result.phoneNumber()),
                 () -> assertEquals("Maria", result.userDto().firstName()),
