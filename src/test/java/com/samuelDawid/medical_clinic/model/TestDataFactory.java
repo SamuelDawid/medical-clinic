@@ -24,8 +24,8 @@ public class TestDataFactory {
         return patient;
     }
 
-    public static Doctor buildDoctor(Long id, String medicalSpecialty, Set<Institution> institutions, User user) {
-        Doctor doctor = new Doctor(medicalSpecialty, institutions, user);
+    public static Doctor buildDoctor(Long id, String medicalSpecialty, User user) {
+        Doctor doctor = new Doctor(medicalSpecialty, user);
         ReflectionTestUtils.setField(doctor, "id", id);
         return doctor;
     }
@@ -36,11 +36,20 @@ public class TestDataFactory {
         return institution;
     }
 
-    public static List<Institution> threeInstiutions() {
+    public static List<Institution> threeInstitutions() {
         List<Address> addresses = threeAddresses();
-        Institution i1 = buildInstitution(1L, "Centrum Medyczne Alfa", addresses.getFirst(), Set.of());
-        Institution i2 = buildInstitution(2L, "Szpital Beta", addresses.get(1), Set.of());
-        Institution i3 = buildInstitution(3L, "Klinika Gamma", addresses.getLast(), Set.of());
+        Institution i1 = buildInstitution(1L,
+                "Centrum Medyczne Alfa",
+                addresses.getFirst(),
+                Set.of());
+        Institution i2 = buildInstitution(2L,
+                "Szpital Beta",
+                addresses.get(1),
+                Set.of());
+        Institution i3 = buildInstitution(3L,
+                "Klinika Gamma",
+                addresses.getLast(),
+                Set.of());
         return List.of(i1, i2, i3);
     }
 
@@ -51,54 +60,53 @@ public class TestDataFactory {
         return List.of(a1, a2, a3);
     }
 
-    public static Set<Doctor> threeDoctors() {
-        User testUser1 = buildUser(1L, "Anna",
-                "Kowalska",
-                "anna.kowalska@test.pl",
-                "testUser1");
-        User testUser2 = buildUser(2L, "Piotr",
-                "Nowak",
-                "piotr.nowak@test.pl",
-                "testUser2");
-        User testUser3 = buildUser(3L, "Maria",
-                "Wisniewska",
-                "maria.wisniewska@test.pl",
-                "testUser3");
-        Doctor doctorTestOne = buildDoctor(1L, "SpecialityOne", Set.of(), testUser1);
-        Doctor doctorTestTwo = buildDoctor(2L, "SpecialityTwo", Set.of(), testUser2);
-        Doctor doctorTestThree = buildDoctor(3L, "SpecialityThree", Set.of(), testUser3);
-        return Set.of(doctorTestOne, doctorTestTwo, doctorTestThree);
+    public static List<Doctor> threeDoctors() {
+        List<User> users = threeUsers();
+        Doctor doctorTestOne = buildDoctor(1L,
+                "SpecialityOne",
+                users.getFirst());
+        Doctor doctorTestTwo = buildDoctor(2L,
+                "SpecialityTwo",
+                users.get(1));
+        Doctor doctorTestThree = buildDoctor(3L,
+                "SpecialityThree",
+                users.getLast());
+        return List.of(doctorTestOne, doctorTestTwo, doctorTestThree);
     }
 
     public static List<Patient> threePatients() {
-        User testUser1 = buildUser(1L, "Anna",
-                "Kowalska",
-                "anna.kowalska@test.pl",
-                "testUser1");
-        User testUser2 = buildUser(2L, "Piotr",
-                "Nowak",
-                "piotr.nowak@test.pl",
-                "testUser2");
-        User testUser3 = buildUser(3L, "Maria",
-                "Wisniewska",
-                "maria.wisniewska@test.pl",
-                "testUser3");
-        Patient test1 = buildPatient(1L, "ABC111111", LocalDate.of(1990, 3, 15), "500100200", testUser1);
-        Patient test2 = buildPatient(2L, "ABC222222", LocalDate.of(1985, 7, 22), "500300400", testUser2);
-        Patient test3 = buildPatient(3L, "ABC333333", LocalDate.of(2001, 11, 8), "500500600", testUser3);
+        List<User> users = threeUsers();
+        Patient test1 = buildPatient(1L,
+                "ABC111111",
+                LocalDate.of(1990, 3, 15),
+                "500100200",
+                users.getFirst());
+        Patient test2 = buildPatient(2L,
+                "ABC222222",
+                LocalDate.of(1985, 7, 22),
+                "500300400",
+                users.get(1));
+        Patient test3 = buildPatient(3L,
+                "ABC333333",
+                LocalDate.of(2001, 11, 8),
+                "500500600",
+                users.getLast());
         return List.of(test1, test2, test3);
     }
 
     public static List<User> threeUsers() {
-        User testUser1 = buildUser(1L, "Anna",
+        User testUser1 = buildUser(1L,
+                "Anna",
                 "Kowalska",
                 "anna.kowalska@test.pl",
                 "testUser1");
-        User testUser2 = buildUser(2L, "Piotr",
+        User testUser2 = buildUser(2L,
+                "Piotr",
                 "Nowak",
                 "piotr.nowak@test.pl",
                 "testUser2");
-        User testUser3 = buildUser(3L, "Maria",
+        User testUser3 = buildUser(3L,
+                "Maria",
                 "Wisniewska",
                 "maria.wisniewska@test.pl",
                 "testUser3");
