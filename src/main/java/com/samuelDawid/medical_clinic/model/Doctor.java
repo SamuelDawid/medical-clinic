@@ -6,6 +6,7 @@ import com.samuelDawid.medical_clinic.service.UserPatcher;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -26,15 +27,14 @@ public class Doctor {
             inverseJoinColumns = @JoinColumn(name = "institution_id")
     )
     @ToString.Exclude
-    private Set<Institution> institutions;
+    private Set<Institution> institutions = new HashSet<>();
     @OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
     @JoinColumn(name = "user_id", referencedColumnName = "id", unique = true)
     @ToString.Exclude
     private User user;
 
-    public Doctor(String medicalSpecialty, Set<Institution> institutions, User user) {
+    public Doctor(String medicalSpecialty, User user) {
         this.medicalSpecialty = medicalSpecialty;
-        this.institutions = institutions;
         this.user = user;
     }
 
@@ -45,6 +45,7 @@ public class Doctor {
         if (command.user() != null) {
             userPatcher.apply(command.user(), this.getUser());
         }
+
     }
 
     @Override
