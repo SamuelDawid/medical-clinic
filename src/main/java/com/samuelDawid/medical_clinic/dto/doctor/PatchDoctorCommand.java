@@ -7,8 +7,6 @@ import org.mapstruct.Mapping;
 public record PatchDoctorCommand(
         @Schema(description = "Medical Speciality", example = "Anesthesiologists", requiredMode = Schema.RequiredMode.REQUIRED)
         String medicalSpecialty,
-        @Schema(description = "Institution id", example = "1")
-        Long institutionId,
         @Mapping(target = "user")
         PatchUserCommand user
 ) {
