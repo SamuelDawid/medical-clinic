@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface InstitutionRepository extends JpaRepository<Institution,Long> {
     Optional<Institution> findByName(String name);
+    boolean existsByName(String name);
 }
