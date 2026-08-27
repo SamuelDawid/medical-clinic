@@ -79,6 +79,7 @@ public class AffiliationService {
                 .collect(Collectors.toSet());
         for (Long id : doctorId) {
             if (!resolvedIds.contains(id)) {
+                log.warn("doctor with Id {} not found while adding doctors to institution",id);
                 throw new DoctorNotFoundException(id);
             }
         }
