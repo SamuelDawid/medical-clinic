@@ -48,12 +48,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserDto findById(@NonNull Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.warn("User with id : {} not found",id);
-                    return new UserNotFoundException();
-                });
-        return userMapper.toDto(user);
+        return userMapper.toDto(getUserOrThrow(id));
     }
 
     @Transactional

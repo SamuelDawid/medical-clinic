@@ -41,12 +41,7 @@ public class DoctorService {
 
     @Transactional(readOnly = true)
     public DoctorDto findById(@NonNull Long id) {
-        return repository.findById(id)
-                .map(mapper::toDto)
-                .orElseThrow(() -> {
-                    log.warn("Doctor with id {} not found", id);
-                    return new DoctorNotFoundException(id);
-                });
+        return mapper.toDto(getDoctorOrThrow(id));
     }
 
     @Transactional
@@ -86,7 +81,6 @@ public class DoctorService {
         User user = userMapper.toEntity(command.user());
         user.setEmail(normalizedEmail);
         doctor.setUser(user);
-
         return doctor;
     }
 

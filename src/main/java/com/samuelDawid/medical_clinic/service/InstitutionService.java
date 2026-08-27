@@ -36,17 +36,15 @@ public class InstitutionService {
 
     @Transactional(readOnly = true)
     public InstitutionDto findById(@NonNull Long id) {
-        return repository.findById(id)
-                .map(mapper::toDto)
-                .orElseThrow(() -> new InstitutionNotFoundException(id));
+        return mapper.toDto(findOrThrow(id));
     }
 
     @Transactional
     public InstitutionDto create(@NonNull CreateInstitutionCommand command) {
         log.info("Creating Institution");
         Institution institution = mapper.toEntity(command);
-        if (repository.findByName(command.name())
-                .isPresent()) {
+        if (repository.existsByName(command.name())) {
+            log.warn("Institution with this ane already exists {}",command.name());
             throw new InstitutionAlreadyExistsException();
         }
         repository.save(institution);
@@ -57,8 +55,7 @@ public class InstitutionService {
     @Transactional
     public InstitutionDoctorsDto addDoctorsToInstitution(Set<Long> doctorsIdList, Long id) {
         log.info("Adding doctors with Ids {} to Institution {}", doctorsIdList, id);
-        Institution institution = repository.findById(id)
-                .orElseThrow(() -> new InstitutionNotFoundException(id));
+        Institution institution = findOrThrow(id);
         return affiliationService.assignDoctorsByIdToInstitution(doctorsIdList, institution);
     }
 
@@ -70,8 +67,7 @@ public class InstitutionService {
     @Transactional
     public InstitutionDto update(@NonNull Long id, @NonNull PatchInsitutionCommand command) {
         log.info("Updating institution {}", id);
-        Institution institution = repository.findById(id)
-                .orElseThrow(() -> new InstitutionNotFoundException(id));
+        Institution institution = findOrThrow(id);
         institution.update(command);
         log.info("Institution {} updated successfully", id);
         return mapper.toDto(institution);
@@ -80,10 +76,15 @@ public class InstitutionService {
     @Transactional
     public void delete(@NonNull Long id) {
         log.info("Removing institution {}", id);
-        Institution institution = repository.findById(id)
-                .orElseThrow(() -> new InstitutionNotFoundException(id));
+        Institution institution = findOrThrow(id);
         repository.delete(institution);
         log.info("institution {} removed successfully", id);
     }
 
+    private Institution findOrThrow(Long id) {
+        return repository.findById(id).orElseThrow(() -> {
+            log.warn("Institution with id {} not found", id);
+            return new InstitutionNotFoundException(id);
+        });
+    }
 }
