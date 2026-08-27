@@ -38,10 +38,11 @@ public class TestDataFactory {
 
     public static List<Institution> threeInstitutions() {
         List<Address> addresses = threeAddresses();
+        List<Doctor> doctors = threeDoctors();
         Institution i1 = buildInstitution(1L,
                 "Centrum Medyczne Alfa",
                 addresses.getFirst(),
-                Set.of());
+                Set.of(doctors.getFirst(),doctors.get(1)));
         Institution i2 = buildInstitution(2L,
                 "Szpital Beta",
                 addresses.get(1),
@@ -54,7 +55,11 @@ public class TestDataFactory {
     }
 
     public static List<Address> threeAddresses() {
-        Address a1 = new Address(1L, "Warszawa", "00-001", "Marszalkowska", "12A");
+        Address a1 = new Address(1L,
+                "Warszawa",
+                "00-001",
+                "Marszalkowska",
+                "12A");
         Address a2 = new Address(2L, "Krakow", "30-002", "Florianska", "45");
         Address a3 = new Address(3L, "Gdansk", "80-003", "Dluga", "7B");
         return List.of(a1, a2, a3);
