@@ -6,6 +6,7 @@ import com.samuelDawid.medical_clinic.validators.EmailValidator;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -35,7 +36,29 @@ public class TestDataFactory {
         ReflectionTestUtils.setField(institution, "id", id);
         return institution;
     }
-
+    public static List<Appointment> threeAppointments(){
+        List<Doctor> doctors = threeDoctors();
+        List<Patient> patients = threePatients();
+        Appointment appointmentOne = new Appointment(
+                LocalDateTime.of(2026,9,15,15,30),
+                LocalDateTime.of(2026,9,15,16,15),
+                patients.getFirst(),
+                doctors.getFirst()
+        );
+        Appointment appointmentTwo = new Appointment(
+                LocalDateTime.of(2026,9,15,11,30),
+                LocalDateTime.of(2026,9,15,12,0),
+                patients.getFirst(),
+                doctors.getFirst()
+        );
+        Appointment appointmentThree = new Appointment(
+                LocalDateTime.of(2026,9,15,10,45),
+                LocalDateTime.of(2026,9,15,11,15),
+                patients.getFirst(),
+                doctors.getFirst()
+        );
+        return List.of(appointmentOne,appointmentTwo,appointmentThree);
+    }
     public static List<Institution> threeInstitutions() {
         List<Address> addresses = threeAddresses();
         List<Doctor> doctors = threeDoctors();
