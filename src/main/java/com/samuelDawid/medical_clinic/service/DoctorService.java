@@ -41,9 +41,7 @@ public class DoctorService {
 
     @Transactional(readOnly = true)
     public DoctorDto findById(@NonNull Long id) {
-        return repository.findById(id)
-                .map(mapper::toDto)
-                .orElseThrow(() -> new DoctorNotFoundException(id));
+        return mapper.toDto(getDoctorOrThrow(id));
     }
 
     @Transactional
@@ -54,7 +52,7 @@ public class DoctorService {
         validateEmail(email);
 
         Doctor doctor = buildDoctor(command, email);
-        affiliationService.assignInstitutionsByIdToDoctor(command.institutionId(),doctor);
+        affiliationService.assignInstitutionsByIdToDoctor(command.institutionId(), doctor);
 
         repository.save(doctor);
         log.info("Doctor {} created successfully", doctor.getId());
@@ -64,8 +62,7 @@ public class DoctorService {
     @Transactional
     public DoctorDto update(@NonNull Long id, @NonNull PatchDoctorCommand command) {
         log.info("Updating Doctor {}", id);
-        Doctor doctor = repository.findById(id)
-                .orElseThrow(() -> new DoctorNotFoundException(id));
+        Doctor doctor = getDoctorOrThrow(id);
         doctor.update(command, userPatcher);
         log.info("Doctor {} updated successfully", id);
         return mapper.toDto(doctor);
@@ -74,8 +71,7 @@ public class DoctorService {
     @Transactional
     public void delete(@NonNull Long id) {
         log.info("Removing Doctor {}", id);
-        Doctor doctor = repository.findById(id)
-                .orElseThrow(() -> new DoctorNotFoundException(id));
+        Doctor doctor = getDoctorOrThrow(id);
         repository.delete(doctor);
         log.info("Doctor {} removed successfully", id);
     }
@@ -85,16 +81,24 @@ public class DoctorService {
         User user = userMapper.toEntity(command.user());
         user.setEmail(normalizedEmail);
         doctor.setUser(user);
-
         return doctor;
     }
 
     private void validateEmail(String email) {
         if (!emailValidator.validate(email)) {
+            log.warn("email : {} not a valid email",email);
             throw new InvalidEmailException(email);
         }
         if (userRepository.existsByEmail(email)) {
+            log.warn("user with email {} already exists",email);
             throw new DoctorAlreadyExistsException();
         }
+    }
+    private Doctor getDoctorOrThrow(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("Doctor with id {} does not exists", id);
+                    return new DoctorNotFoundException(id);
+                });
     }
 }

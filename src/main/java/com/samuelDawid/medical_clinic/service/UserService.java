@@ -48,17 +48,14 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserDto findById(@NonNull Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(UserNotFoundException::new);
-        return userMapper.toDto(user);
+        return userMapper.toDto(getUserOrThrow(id));
     }
 
     @Transactional
     public void changePassword(@NonNull Long id, @NonNull ChangePasswordCommand command) {
         log.info("Changing password for User with Id {}", id);
         validatePassword(command.newPassword());
-        User user = userRepository.findById(id)
-                .orElseThrow(UserNotFoundException::new);
+        User user = getUserOrThrow(id);
         user.setPassword(command.newPassword());
         log.info("Password changed for User {}", id);
     }
@@ -66,24 +63,36 @@ public class UserService {
     @Transactional
     public void deleteUser(@NonNull Long id) {
         log.info("Deleting user with Id {}", id);
-        User user = userRepository.findById(id)
-                .orElseThrow(UserNotFoundException::new);
+        User user = getUserOrThrow(id);
         userRepository.delete(user);
         log.info("User with Id {} removed", id);
     }
 
     private void validateEmail(String email) {
         if (!emailValidator.validate(email)) {
+            log.warn("email : {} not a valid email",email);
             throw new InvalidEmailException(email);
         }
         if (userRepository.existsByEmail(email)) {
+            log.warn("user with email {} already exists",email);
             throw new UserAlreadyExistsException();
         }
     }
 
     private void validatePassword(String password) {
         if (password.isBlank()) {
+            log.warn("blank or null password");
             throw new InvalidPasswordException();
         }
+        if(password.length() < 5){
+            log.warn("password too short");
+            throw new InvalidPasswordException();
+        }
+    }
+    private User getUserOrThrow(Long id){
+        return userRepository.findById(id).orElseThrow(() -> {
+            log.warn("deleting user with id {} failed, user not found",id);
+            return new UserNotFoundException();
+        });
     }
 }

@@ -21,7 +21,7 @@ public class MedicalClinicExceptionHandler {
 
     @ExceptionHandler(MedicalClinicException.class)
     public ResponseEntity<ErrorMessageDto> handleMedicalClinicException(MedicalClinicException exception) {
-        log.warn("Rejected: {} -> {}",exception.getMessage(), exception.getStatus().value());
+        log.error("Rejected: {} -> {}",exception.getMessage(), exception.getStatus().value());
         return ResponseEntity.status(exception.getStatus())
                 .body(new ErrorMessageDto(exception.getMessage(), exception.getStatus()
                         .value(), LocalDateTime.now()

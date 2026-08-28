@@ -20,7 +20,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Set;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -29,75 +31,86 @@ public class AppointmentService {
     private final AppointmentMapper mapper;
     private final DoctorRepository doctorRepository;
     private final PatientRepository patientRepository;
+
     @Transactional(readOnly = true)
     public PageDto<AppointmentDto> findAll(Pageable pageable) {
         return PageDto.from(repository.findAll(pageable)
                 .map(mapper::toDto));
     }
+
     @Transactional(readOnly = true)
     public PageDto<AppointmentDto> findAllByPatientId(@NonNull Long id, Pageable pageable) {
         return PageDto.from(repository.findAllByPatientId(id, pageable)
                 .map(mapper::toDto));
     }
+
     @Transactional(readOnly = true)
     public AppointmentDto findById(@NonNull Long id) {
-        Appointment appointment = repository.findById(id)
-                .orElseThrow(AppointmentDoesNotExistsException::new);
-        return mapper.toDto(appointment);
+        return mapper.toDto(findOrThrow(id));
     }
+
     @Transactional
     public AppointmentDto create(@NonNull CreateAppointmentCommand command) {
         log.info("Creating appointment with doctor Id {} and patient Id {} with date {} to {}",
-                command.doctorId(),command.patientId(),command.startDateTime(),command.endDateTime());
+                command.doctorId(), command.patientId(), command.startDateTime(), command.endDateTime());
         Appointment appointment = mapper.toEntity(command);
 
         Doctor doctor = doctorRepository.findByIdForUpdate(command.doctorId())
-                .orElseThrow(() -> new DoctorNotFoundException(command.doctorId()));
+                .orElseThrow(() -> {
+                    log.warn("doctor with id {} does not exist", command.doctorId());
+                    return new DoctorNotFoundException(command.doctorId());
+                });
         appointment.setDoctor(doctor);
 
         validateDate(appointment.getStartDateTime());
         validateTimeOfTheVisit(appointment);
         assignPatientAtAppointmentCreation(command, appointment);
-        repository.save(appointment);
-        log.info("Appointment with Id {} Created",appointment.getId());
-        return mapper.toDto(appointment);
+        Appointment saved = repository.save(appointment);
+        log.info("Appointment with Id {} Created", appointment.getId());
+        return mapper.toDto(saved);
     }
+
     @Transactional
     public void removePatientFromVisit(@NonNull Long appointmentId) {
-        log.info("Removing Patient from Visit with Id {}",appointmentId);
-        Appointment appointment = repository.findById(appointmentId)
-                .orElseThrow(AppointmentDoesNotExistsException::new);
+        log.info("Removing Patient from Visit with Id {}", appointmentId);
+        Appointment appointment = findOrThrow(appointmentId);
         appointment.setPatient(null);
-        log.info("Patient removed successfully from visit with Id {} ",appointmentId);
+        log.info("Patient removed successfully from visit with Id {} ", appointmentId);
     }
+
     @Transactional
     public AppointmentDto assignPatientToAppointment(@NonNull AssignPatientToAppointmentCommand command) {
-        log.info("Assigning Patient with Id {} To Appointment with Id {}",command.patientId(),command.appointmentId());
+        log.info("Assigning Patient with Id {} To Appointment with Id {}", command.patientId(), command.appointmentId());
         Appointment appointment = repository.findWithLockById(command.appointmentId())
                 .orElseThrow(AppointmentDoesNotExistsException::new);
         if (appointment.getPatient() != null) {
+            log.warn("Couldn't assign patient because appointment already exists");
             throw new AppointmentAlreadyTakenException();
         }
 
         validateDate(appointment.getStartDateTime());
         Patient patient = patientRepository.findById(command.patientId())
-                .orElseThrow(PatientWithIdNotFoundException::new);
+                .orElseThrow(() ->{
+                    log.warn("Could not assign patient {} to appointment {} as patient does not exists",command.patientId(),command.appointmentId());
+                    return new PatientWithIdNotFoundException();
+                });
         appointment.setPatient(patient);
-        log.info("Patient with Id {} assigned successfully to visit with Id {}",command.patientId(),command.appointmentId());
+        log.info("Patient with Id {} assigned successfully to visit with Id {}", command.patientId(), command.appointmentId());
         return mapper.toDto(appointment);
     }
+
     @Transactional
     public void delete(@NonNull Long appointmentId) {
-        log.info("Deleting appointment with id {}",appointmentId);
-        Appointment appointment = repository.findById(appointmentId)
-                .orElseThrow(AppointmentDoesNotExistsException::new);
+        log.info("Deleting appointment with id {}", appointmentId);
+        Appointment appointment = findOrThrow(appointmentId);
         repository.delete(appointment);
-        log.info("Appointment {} deleted successfully",appointmentId);
+        log.info("Appointment {} deleted successfully", appointmentId);
     }
 
     private void validateDate(@NonNull LocalDateTime dateAndTime) {
-        log.debug("Checking if time is correct {}",dateAndTime);
+        log.debug("Checking if time is correct {}", dateAndTime);
         if (dateAndTime.isBefore(LocalDateTime.now())) {
+            log.warn("Invalid date, must be ahead of {}",LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
             throw new InvalidDateOfAppointmentException();
         }
     }
@@ -105,14 +118,17 @@ public class AppointmentService {
     private void assignPatientAtAppointmentCreation(@NonNull CreateAppointmentCommand command, Appointment appointment) {
         if (command.patientId() != null) {
             Patient patient = patientRepository.findById(command.patientId())
-                    .orElseThrow(PatientWithIdNotFoundException::new);
+                    .orElseThrow(() -> {
+                        log.warn("Patient with id {} does not exist", command.patientId());
+                        return new PatientNotFoundException();
+                    });
             appointment.setPatient(patient);
         }
     }
 
     private void validateTimeOfTheVisit(@NonNull Appointment appointmentToCreate) {
         log.debug("Checking overlaps for doctor {} between {} and {}",
-                appointmentToCreate.getDoctor().getId(),appointmentToCreate.getStartDateTime(),appointmentToCreate.getEndDateTime());
+                appointmentToCreate.getDoctor().getId(), appointmentToCreate.getStartDateTime(), appointmentToCreate.getEndDateTime());
         int minutes = appointmentToCreate.getStartDateTime()
                 .getMinute();
         if (!validateMinutes(minutes)) {
@@ -123,10 +139,18 @@ public class AppointmentService {
                 appointmentToCreate.getEndDateTime(),
                 appointmentToCreate.getStartDateTime()
         );
-        log.debug("Found {} overlapping appointments",appointments.size());
+        log.debug("Found {} overlapping appointments", appointments.size());
         if (!appointments.isEmpty()) {
             throw new TimeIsOverlappingWithAnotherAppointmentException();
         }
+    }
+
+    private Appointment findOrThrow(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("Appointment with id {} does not exists", id);
+                    return new AppointmentDoesNotExistsException();
+                });
     }
 
     private boolean validateMinutes(int minutes) {
