@@ -232,7 +232,10 @@ class DoctorServiceTest {
         DoctorDto result = doctorService.update(existingId, patchDoctorCommand);
         //Then
         Assertions.assertAll(
-                () -> assertEquals("newMedicalSpeciality", result.medicalSpecialty())
+                () -> assertEquals("newMedicalSpeciality", result.medicalSpecialty()),
+                () -> assertEquals("changedName",result.userDto().firstName()),
+                () -> assertEquals("changedSurname",result.userDto().lastName()),
+                () -> assertEquals("newemai@example.com",result.userDto().email())
         );
     }
 
@@ -248,6 +251,7 @@ class DoctorServiceTest {
         //When + Then
         DoctorNotFoundException exception = Assertions.assertThrows(DoctorNotFoundException.class,
                 () -> doctorService.update(id,patchDoctorCommand));
+        assertTrue(exception.getMessage().contains("Doctor "+ id +" not found"));
     }
 
     @Test
@@ -262,8 +266,10 @@ class DoctorServiceTest {
 
     @Test
     void deleteById_WhenDoctorDoesNotExist_ShouldThrowDoctorNotFoundException() {
+        //Given
         Long id = 666L;
         when(repository.findById(id)).thenReturn(Optional.empty());
+        //When + Then
         assertThrows(DoctorNotFoundException.class,
                 () -> doctorService.delete(id));
     }
