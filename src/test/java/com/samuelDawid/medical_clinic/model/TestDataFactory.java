@@ -1,5 +1,6 @@
 package com.samuelDawid.medical_clinic.model;
 
+import com.samuelDawid.medical_clinic.dto.appointment.AppointmentDto;
 import com.samuelDawid.medical_clinic.model.institution.Address;
 import com.samuelDawid.medical_clinic.model.institution.Institution;
 import com.samuelDawid.medical_clinic.validators.EmailValidator;
@@ -35,6 +36,56 @@ public class TestDataFactory {
         Institution institution = new Institution(name, address, doctors);
         ReflectionTestUtils.setField(institution, "id", id);
         return institution;
+    }
+    public static List<AppointmentDto> threeAppointmentsFotTheSamePatient(String patientName){
+        return List.of(
+                new AppointmentDto(
+                        1L,
+                        LocalDateTime.of(2026, 9, 1, 9, 15),
+                        LocalDateTime.of(2026, 9, 1, 10, 15),
+                        "John Doe",
+                        patientName
+                ),
+                new AppointmentDto(
+                        2L,
+                        LocalDateTime.of(2026, 9, 3, 13, 30),
+                        LocalDateTime.of(2026, 9, 3, 14, 15),
+                        "Emily Smith",
+                        patientName
+                ),
+                new AppointmentDto(
+                        3L,
+                        LocalDateTime.of(2026, 9, 8, 15, 45),
+                        LocalDateTime.of(2026, 9, 8, 16, 30),
+                        "Michael Johnson",
+                        patientName
+                )
+        );
+
+    }
+    public static List<AppointmentDto> threeAppointmentsDtos(){
+        AppointmentDto appointmentDtoFirst = new AppointmentDto(
+                1L,
+                LocalDateTime.of(2026,9,15,15,30),
+                LocalDateTime.of(2026,9,15,16,15),
+                "Anna Kowalska",
+                "Piotr Nowak"
+        );
+        AppointmentDto appointmentDtoSecond = new AppointmentDto(
+                2L,
+                LocalDateTime.of(2026,9,15,11,30),
+                LocalDateTime.of(2026,9,15,12,0),
+                "Robert Berathion",
+                "Jhon Snow"
+        );
+        AppointmentDto appointmentDtoThird = new AppointmentDto(
+                3L,
+                LocalDateTime.of(2026,9,15,10,45),
+                LocalDateTime.of(2026,9,15,11,15),
+                "Hubert Piwowarczyk",
+                "Alicja Nowak"
+        );
+        return List.of(appointmentDtoFirst,appointmentDtoSecond,appointmentDtoThird);
     }
     public static List<Appointment> threeAppointments(){
         List<Doctor> doctors = threeDoctors();
