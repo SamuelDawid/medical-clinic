@@ -10,7 +10,6 @@ import com.samuelDawid.medical_clinic.model.TestDataFactory;
 import com.samuelDawid.medical_clinic.service.AppointmentService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +25,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -37,9 +37,7 @@ class AppointmentControllerTest {
     ObjectMapper objectMapper;
     @MockitoBean
     AppointmentService appointmentService;
-    List<AppointmentDto> appointmentList = TestDataFactory.threeAppointmentsDtos();
-    @Autowired
-    private ServerProperties serverProperties;
+    List<AppointmentDto> appointmentList = TestDataFactory.threeAppointmentsDto();
 
     @Test
     void findAll_WhenAppointmentsExists_ShouldReturnPageWithThreeAppointments() throws Exception {
@@ -69,7 +67,6 @@ class AppointmentControllerTest {
         when(appointmentService.findById(existingId)).thenReturn(appointmentDto);
         //When + Then
         mockMvc.perform(get("/appointments/{id}", existingId))
-                .andDo(print())
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$.id").value(1),
@@ -129,8 +126,7 @@ class AppointmentControllerTest {
                 LocalDateTime.of(2026, 9, 3, 14, 15), "Piotr Nowak", null);
         when(appointmentService.create(command)).thenReturn(appointmentDto);
         //When + Then
-        mockMvc.perform(
-                        post("/appointments")
+        mockMvc.perform(post("/appointments")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(command)))
                 .andExpectAll(
@@ -201,6 +197,7 @@ class AppointmentControllerTest {
                         jsonPath("$.status").value(404)
                 );
     }
+
     @Test
     void create_WhenAppointmentOverlaps_ShouldReturn409() throws Exception {
         //Given
@@ -221,12 +218,13 @@ class AppointmentControllerTest {
                         jsonPath("$.status").value(409)
                 );
     }
+
     @Test
-    void assignPatientToAppointment_WhenAppointmentAndPatientExists_ShouldReturn200() throws Exception{
+    void assignPatientToAppointment_WhenAppointmentAndPatientExists_ShouldReturn200() throws Exception {
         //Given
         Long existingPatientId = 1L;
         Long existingAppointmentId = 2L;
-        AssignPatientToAppointmentCommand command = new AssignPatientToAppointmentCommand(existingPatientId,existingAppointmentId);
+        AssignPatientToAppointmentCommand command = new AssignPatientToAppointmentCommand(existingPatientId, existingAppointmentId);
         AppointmentDto result = new AppointmentDto(
                 1L,
                 LocalDateTime.of(2026, 9, 3, 13, 30),
@@ -236,46 +234,57 @@ class AppointmentControllerTest {
         when(appointmentService.assignPatientToAppointment(command)).thenReturn(result);
         //Then + When
         mockMvc.perform(put("/appointments")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(command)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(command)))
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$.id").value(1)
                 );
     }
+
     @Test
-    void patientAppointmentCancel_WhenPatientAndAppointmentExists_ShouldReturn204() throws Exception{
+    void patientAppointmentCancel_WhenPatientAndAppointmentExists_ShouldReturn204() throws Exception {
+        //Given
         Long appointmentId = 1L;
-        mockMvc.perform(patch("/appointments/cancel/{appointmentId}",appointmentId))
+        //Then + When
+        mockMvc.perform(patch("/appointments/cancel/{appointmentId}", appointmentId))
                 .andExpect(status().isNoContent());
         verify(appointmentService).removePatientFromVisit(appointmentId);
     }
+
     @Test
     void patientAppointmentCancel_ShouldReturnNotFoundWhenCancellingNonExistingAppointmentAndReturn404() throws Exception {
+        //Given
         Long appointmentId = 666L;
+        //Then + When
         doThrow(new AppointmentDoesNotExistsException())
                 .when(appointmentService)
                 .removePatientFromVisit(appointmentId);
-        mockMvc.perform(patch("/appointments/cancel/{appointmentId}",appointmentId))
+        mockMvc.perform(patch("/appointments/cancel/{appointmentId}", appointmentId))
                 .andExpect(status().isNotFound());
         verify(appointmentService).removePatientFromVisit(appointmentId);
     }
-    @Test
-    void delete_whenAppointmentExists_ShouldDeleteAppointmentAndReturn204() throws Exception{
-        Long appointmentId = 1L;
 
+    @Test
+    void delete_whenAppointmentExists_ShouldDeleteAppointmentAndReturn204() throws Exception {
+        //Given
+        Long appointmentId = 1L;
+        //When + Then
         mockMvc.perform(delete("/appointments/{id}", appointmentId))
                 .andExpect(status().isNoContent());
 
         verify(appointmentService).delete(appointmentId);
     }
+
     @Test
-    void delete_WhenAppointmentDoesNotExists_ShouldReturnAppointmentDoesNotExistsAnd404() throws Exception{
+    void delete_WhenAppointmentDoesNotExists_ShouldReturnAppointmentDoesNotExistsAnd404() throws Exception {
+        //Given
         Long appointmentId = 999L;
+        //When + Then
         doThrow(new AppointmentDoesNotExistsException())
                 .when(appointmentService)
                 .delete(appointmentId);
-        mockMvc.perform(delete("/appointments/{id}",appointmentId))
+        mockMvc.perform(delete("/appointments/{id}", appointmentId))
                 .andExpect(status().isNotFound());
         verify(appointmentService).delete(appointmentId);
     }
