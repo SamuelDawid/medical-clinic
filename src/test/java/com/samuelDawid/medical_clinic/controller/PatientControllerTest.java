@@ -1,7 +1,6 @@
 package com.samuelDawid.medical_clinic.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.samuelDawid.medical_clinic.dto.ChangePasswordCommand;
 import com.samuelDawid.medical_clinic.dto.PageDto;
 import com.samuelDawid.medical_clinic.dto.patient.CreatePatientCommand;
 import com.samuelDawid.medical_clinic.dto.patient.PatchPatientCommand;
@@ -26,7 +25,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -98,7 +96,7 @@ class PatientControllerTest {
                 "testUser1"
         );
         CreatePatientCommand command = new CreatePatientCommand("ABC111111",
-                LocalDate.of(2000,1,11),
+                LocalDate.of(2000, 1, 11),
                 "111-222-33",
                 userCommand);
         PatientDto patientDto = patientDtoList.getFirst();
@@ -113,25 +111,26 @@ class PatientControllerTest {
                         jsonPath("$.phoneNumber").value("111-222-333")
                 );
     }
+
     @Test
-    void update_WhenPatientExists_ShouldReturn200() throws Exception{
+    void update_WhenPatientExists_ShouldReturn200() throws Exception {
         //Given
         Long id = 1L;
         PatchPatientCommand command = new PatchPatientCommand(
                 "newNumber",
-                LocalDate.of(2020,1,1),
+                LocalDate.of(2020, 1, 1),
                 "newPhoneNumber",
                 null
         );
         PatientDto patientDto = new PatientDto(1L,
                 null,
-                LocalDate.of(2020,1,1),
+                LocalDate.of(2020, 1, 1),
                 "newPhoneNumber");
-        when(patientService.updatePatient(id,command)).thenReturn(patientDto);
+        when(patientService.updatePatient(id, command)).thenReturn(patientDto);
         //When + Then
-        mockMvc.perform(patch("/patients/{id}",id)
-                .content(objectMapper.writeValueAsString(command))
-                .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(patch("/patients/{id}", id)
+                        .content(objectMapper.writeValueAsString(command))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$.id").value(1),
@@ -139,38 +138,41 @@ class PatientControllerTest {
                         jsonPath("$.birthDay").value("2020-01-01")
                 );
     }
+
     @Test
-    void update_WhenPatientDoesNotExists_ShouldReturn404() throws Exception{
+    void update_WhenPatientDoesNotExists_ShouldReturn404() throws Exception {
         //Given
         Long id = 666L;
         PatchPatientCommand command = new PatchPatientCommand(
                 "newNumber",
-                LocalDate.of(2020,1,1),
+                LocalDate.of(2020, 1, 1),
                 "newPhoneNumber",
                 null
         );
-        when(patientService.updatePatient(id,command)).thenThrow(new PatientNotFoundException());
+        when(patientService.updatePatient(id, command)).thenThrow(new PatientNotFoundException());
         //When + Then
-        mockMvc.perform(patch("/patients/{id}",id)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(command)))
+        mockMvc.perform(patch("/patients/{id}", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(command)))
                 .andExpectAll(
                         status().isNotFound(),
                         jsonPath("$.status").value(404),
                         jsonPath("$.message").value("Patient not found")
                 );
     }
+
     @Test
-    void delete_WhenPatientExists_ShouldReturn204() throws Exception{
+    void delete_WhenPatientExists_ShouldReturn204() throws Exception {
         Long id = 1L;
-        mockMvc.perform(delete("/patients//id/{id}",id)).andExpect(status().isNoContent());
+        mockMvc.perform(delete("/patients//id/{id}", id)).andExpect(status().isNoContent());
         verify(patientService).deleteById(id);
     }
+
     @Test
-    void delete_WhenPatientDoesNotExists_ShouldReturn404()throws Exception{
+    void delete_WhenPatientDoesNotExists_ShouldReturn404() throws Exception {
         Long id = 666L;
         doThrow(new PatientNotFoundException()).when(patientService).deleteById(id);
-        mockMvc.perform(delete("/patients//id/{id}",id)).andExpect(status().isNotFound());
+        mockMvc.perform(delete("/patients//id/{id}", id)).andExpect(status().isNotFound());
         verify(patientService).deleteById(id);
     }
 }

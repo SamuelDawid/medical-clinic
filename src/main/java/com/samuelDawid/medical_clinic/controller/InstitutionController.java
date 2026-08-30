@@ -5,7 +5,7 @@ import com.samuelDawid.medical_clinic.dto.doctor.DoctorDto;
 import com.samuelDawid.medical_clinic.dto.institution.CreateInstitutionCommand;
 import com.samuelDawid.medical_clinic.dto.institution.InstitutionDoctorsDto;
 import com.samuelDawid.medical_clinic.dto.institution.InstitutionDto;
-import com.samuelDawid.medical_clinic.dto.institution.PatchInsitutionCommand;
+import com.samuelDawid.medical_clinic.dto.institution.PatchInstitutionCommand;
 import com.samuelDawid.medical_clinic.service.InstitutionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -59,7 +59,9 @@ public class InstitutionController {
 
     @Operation(summary = "Add list of doctors to Institution")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Doctors added Successfully")
+            @ApiResponse(responseCode = "200", description = "Doctors added Successfully"),
+            @ApiResponse(responseCode = "404",description = "Invalid institution id"),
+            @ApiResponse(responseCode = "404", description = "Doctor not found")
     })
     @PatchMapping("/institution/{id}/doctors")
     @ResponseStatus(HttpStatus.OK)
@@ -86,7 +88,7 @@ public class InstitutionController {
     })
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public InstitutionDto update(@PathVariable Long id, @RequestBody PatchInsitutionCommand command) {
+    public InstitutionDto update(@PathVariable Long id, @RequestBody PatchInstitutionCommand command) {
         return service.update(id, command);
     }
 
