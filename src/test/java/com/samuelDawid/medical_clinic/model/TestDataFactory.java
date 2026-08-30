@@ -3,6 +3,7 @@ package com.samuelDawid.medical_clinic.model;
 import com.samuelDawid.medical_clinic.dto.appointment.AppointmentDto;
 import com.samuelDawid.medical_clinic.dto.doctor.DoctorDto;
 import com.samuelDawid.medical_clinic.dto.institution.InstitutionDto;
+import com.samuelDawid.medical_clinic.dto.patient.PatientDto;
 import com.samuelDawid.medical_clinic.dto.user.UserDto;
 import com.samuelDawid.medical_clinic.model.institution.Address;
 import com.samuelDawid.medical_clinic.model.institution.Institution;
@@ -150,7 +151,23 @@ public class TestDataFactory {
         );
         return List.of(appointmentDtoFirst, appointmentDtoSecond, appointmentDtoThird);
     }
+    public static List<PatientDto> threePatientDto(){
 
+        return List.of(
+                new PatientDto(1L,
+                        threeUsersDto.getFirst(),
+                        LocalDate.of(2000,1,11),
+                        "111-222-333"),
+                new PatientDto(2L,
+                        threeUsersDto.get(1),
+                        LocalDate.of(2005,5,15),
+                        "222-333-444"),
+                new PatientDto(3L,
+                        threeUsersDto.getLast(),
+                        LocalDate.of(1995,6,11),
+                        "333-444-555")
+        );
+    }
     public static List<Appointment> threeAppointments() {
         List<Doctor> doctors = threeDoctors();
         List<Patient> patients = threePatients();
