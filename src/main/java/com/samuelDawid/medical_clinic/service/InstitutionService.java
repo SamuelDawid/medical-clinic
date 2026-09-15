@@ -5,7 +5,7 @@ import com.samuelDawid.medical_clinic.dto.doctor.DoctorDto;
 import com.samuelDawid.medical_clinic.dto.institution.CreateInstitutionCommand;
 import com.samuelDawid.medical_clinic.dto.institution.InstitutionDoctorsDto;
 import com.samuelDawid.medical_clinic.dto.institution.InstitutionDto;
-import com.samuelDawid.medical_clinic.dto.institution.PatchInsitutionCommand;
+import com.samuelDawid.medical_clinic.dto.institution.PatchInstitutionCommand;
 import com.samuelDawid.medical_clinic.exceptions.InstitutionAlreadyExistsException;
 import com.samuelDawid.medical_clinic.exceptions.InstitutionNotFoundException;
 import com.samuelDawid.medical_clinic.mappers.InstitutionMapper;
@@ -65,7 +65,7 @@ public class InstitutionService {
     }
 
     @Transactional
-    public InstitutionDto update(@NonNull Long id, @NonNull PatchInsitutionCommand command) {
+    public InstitutionDto update(@NonNull Long id, @NonNull PatchInstitutionCommand command) {
         log.info("Updating institution {}", id);
         Institution institution = findOrThrow(id);
         institution.update(command);

@@ -48,7 +48,7 @@ public class AppointmentController {
     @Operation(summary = "Create appointment, patient does not need to be assigned")
     @ApiResponse(responseCode = "201", description = "Appointment created")
     @ApiResponse(responseCode = "400", description = "Appointment is in the past or does not start at a full quarter of an hour")
-    @ApiResponse(responseCode = "404", description = "Doctor or patient not found")
+    @ApiResponse(responseCode = "404", description = "Doctor not found")
     @ApiResponse(responseCode = "409", description = "Appointment overlaps with another appointment of this doctor")
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)

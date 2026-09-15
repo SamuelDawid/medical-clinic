@@ -2,7 +2,7 @@ package com.samuelDawid.medical_clinic.dto.institution;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-public record PatchInsitutionCommand(
+public record PatchInstitutionCommand(
         @Schema(description = "Name",example = "NewCare Clinic",requiredMode = Schema.RequiredMode.REQUIRED)
         String name,
         @Schema(description = "City", example = "Chicago")

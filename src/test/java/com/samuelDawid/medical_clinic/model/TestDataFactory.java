@@ -1,5 +1,10 @@
 package com.samuelDawid.medical_clinic.model;
 
+import com.samuelDawid.medical_clinic.dto.appointment.AppointmentDto;
+import com.samuelDawid.medical_clinic.dto.doctor.DoctorDto;
+import com.samuelDawid.medical_clinic.dto.institution.InstitutionDto;
+import com.samuelDawid.medical_clinic.dto.patient.PatientDto;
+import com.samuelDawid.medical_clinic.dto.user.UserDto;
 import com.samuelDawid.medical_clinic.model.institution.Address;
 import com.samuelDawid.medical_clinic.model.institution.Institution;
 import com.samuelDawid.medical_clinic.validators.EmailValidator;
@@ -36,36 +41,164 @@ public class TestDataFactory {
         ReflectionTestUtils.setField(institution, "id", id);
         return institution;
     }
-    public static List<Appointment> threeAppointments(){
+
+    public static List<AppointmentDto> threeAppointmentsFotTheSamePatient(String patientName) {
+        return List.of(
+                new AppointmentDto(
+                        1L,
+                        LocalDateTime.of(2026, 9, 1, 9, 15),
+                        LocalDateTime.of(2026, 9, 1, 10, 15),
+                        "John Doe",
+                        patientName
+                ),
+                new AppointmentDto(
+                        2L,
+                        LocalDateTime.of(2026, 9, 3, 13, 30),
+                        LocalDateTime.of(2026, 9, 3, 14, 15),
+                        "Emily Smith",
+                        patientName
+                ),
+                new AppointmentDto(
+                        3L,
+                        LocalDateTime.of(2026, 9, 8, 15, 45),
+                        LocalDateTime.of(2026, 9, 8, 16, 30),
+                        "Michael Johnson",
+                        patientName
+                )
+        );
+
+    }
+    public static List<UserDto> threeUsersDto = List.of(
+            new UserDto(1L,
+                    "Anna",
+                    "Kowalska",
+                    "anna.kowalska@test.pl"),
+            new UserDto(2L,
+                    "Piotr",
+                    "Nowak",
+                    "piotr.nowak@test.pl"),
+            new UserDto(3L,
+                    "Maria",
+                    "Wisniewska",
+                    "maria.wisniewska@test.pl")
+    );
+    public static List<DoctorDto> threeDoctorsDto(){
+        List<UserDto> users = threeUsersDto;
+        List<InstitutionDto> institutionDto = threeInstitutionsDto();
+        return List.of(
+                new DoctorDto(
+                        1L,
+                        "Kardiologia",
+                        Set.of(institutionDto.getFirst()),
+                        users.getFirst()
+                ),
+                new DoctorDto(
+                        2L,
+                        "Ortopedia",
+                        Set.of(institutionDto.get(1)),
+                        users.get(1)
+                ),
+                new DoctorDto(
+                        3L,
+                        "Dermatologia",
+                        Set.of(institutionDto.get(2)),
+                        users.getLast()
+                ));
+    }
+
+    public static List<InstitutionDto> threeInstitutionsDto() {
+        List<Address> addresses = threeAddresses();
+        return List.of(
+                new InstitutionDto(
+                        1L,
+                        "Szpital Kliniczny im. Jana Pawła II",
+                        addresses.getFirst()
+                ),
+                new InstitutionDto(
+                        2L,
+                        "Centrum Medyczne Nowe Zdrowie",
+                        addresses.get(1)
+                ),
+                new InstitutionDto(
+                        3L,
+                        "Wojewódzki Szpital Specjalistyczny",
+                        addresses.getLast()
+                )
+        );
+    }
+
+    public static List<AppointmentDto> threeAppointmentsDto() {
+        AppointmentDto appointmentDtoFirst = new AppointmentDto(
+                1L,
+                LocalDateTime.of(2026, 9, 15, 15, 30),
+                LocalDateTime.of(2026, 9, 15, 16, 15),
+                "Anna Kowalska",
+                "Piotr Nowak"
+        );
+        AppointmentDto appointmentDtoSecond = new AppointmentDto(
+                2L,
+                LocalDateTime.of(2026, 9, 15, 11, 30),
+                LocalDateTime.of(2026, 9, 15, 12, 0),
+                "Robert Berathion",
+                "Jhon Snow"
+        );
+        AppointmentDto appointmentDtoThird = new AppointmentDto(
+                3L,
+                LocalDateTime.of(2026, 9, 15, 10, 45),
+                LocalDateTime.of(2026, 9, 15, 11, 15),
+                "Hubert Piwowarczyk",
+                "Alicja Nowak"
+        );
+        return List.of(appointmentDtoFirst, appointmentDtoSecond, appointmentDtoThird);
+    }
+    public static List<PatientDto> threePatientDto(){
+
+        return List.of(
+                new PatientDto(1L,
+                        threeUsersDto.getFirst(),
+                        LocalDate.of(2000,1,11),
+                        "111-222-333"),
+                new PatientDto(2L,
+                        threeUsersDto.get(1),
+                        LocalDate.of(2005,5,15),
+                        "222-333-444"),
+                new PatientDto(3L,
+                        threeUsersDto.getLast(),
+                        LocalDate.of(1995,6,11),
+                        "333-444-555")
+        );
+    }
+    public static List<Appointment> threeAppointments() {
         List<Doctor> doctors = threeDoctors();
         List<Patient> patients = threePatients();
         Appointment appointmentOne = new Appointment(
-                LocalDateTime.of(2026,9,15,15,30),
-                LocalDateTime.of(2026,9,15,16,15),
+                LocalDateTime.of(2026, 9, 15, 15, 30),
+                LocalDateTime.of(2026, 9, 15, 16, 15),
                 patients.getFirst(),
                 doctors.getFirst()
         );
         Appointment appointmentTwo = new Appointment(
-                LocalDateTime.of(2026,9,15,11,30),
-                LocalDateTime.of(2026,9,15,12,0),
+                LocalDateTime.of(2026, 9, 15, 11, 30),
+                LocalDateTime.of(2026, 9, 15, 12, 0),
                 patients.getFirst(),
                 doctors.getFirst()
         );
         Appointment appointmentThree = new Appointment(
-                LocalDateTime.of(2026,9,15,10,45),
-                LocalDateTime.of(2026,9,15,11,15),
+                LocalDateTime.of(2026, 9, 15, 10, 45),
+                LocalDateTime.of(2026, 9, 15, 11, 15),
                 patients.getFirst(),
                 doctors.getFirst()
         );
-        return List.of(appointmentOne,appointmentTwo,appointmentThree);
+        return List.of(appointmentOne, appointmentTwo, appointmentThree);
     }
+
     public static List<Institution> threeInstitutions() {
         List<Address> addresses = threeAddresses();
         List<Doctor> doctors = threeDoctors();
         Institution i1 = buildInstitution(1L,
                 "Centrum Medyczne Alfa",
                 addresses.getFirst(),
-                Set.of(doctors.getFirst(),doctors.get(1)));
+                Set.of(doctors.getFirst(), doctors.get(1)));
         Institution i2 = buildInstitution(2L,
                 "Szpital Beta",
                 addresses.get(1),

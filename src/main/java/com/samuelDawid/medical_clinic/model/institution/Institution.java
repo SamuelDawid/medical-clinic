@@ -1,6 +1,6 @@
 package com.samuelDawid.medical_clinic.model.institution;
 
-import com.samuelDawid.medical_clinic.dto.institution.PatchInsitutionCommand;
+import com.samuelDawid.medical_clinic.dto.institution.PatchInstitutionCommand;
 import com.samuelDawid.medical_clinic.model.Doctor;
 import jakarta.persistence.*;
 import lombok.*;
@@ -35,7 +35,7 @@ public class Institution {
         this.doctors = doctors;
     }
 
-    public void update(@NonNull PatchInsitutionCommand command) {
+    public void update(@NonNull PatchInstitutionCommand command) {
         if (command.name() != null) {
             this.setName(command.name());
         }

@@ -35,7 +35,7 @@ public class PatientController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Patient found"),
             @ApiResponse(responseCode = "404", description = "Patient not found"),
-            @ApiResponse(responseCode = "400", description = "Invalid email supplied")
+            @ApiResponse(responseCode = "400", description = "Invalid id supplied")
     })
     @GetMapping("/{id}")
     public PatientDto byId(@PathVariable Long id) {
@@ -56,7 +56,7 @@ public class PatientController {
     @Operation(summary = "Updates Patient Details")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Patient Updated Successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid email supplied"),
+            @ApiResponse(responseCode = "400", description = "Invalid id supplied"),
             @ApiResponse(responseCode = "404", description = "Patient not found")
     })
     @PatchMapping("/{id}")

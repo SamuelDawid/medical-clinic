@@ -56,7 +56,7 @@ public class DoctorController {
     @Operation(summary = "Update Doctor")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Doctor Updated Successfully"),
-            @ApiResponse(responseCode = "400", description = "Doctor id supplied"),
+            @ApiResponse(responseCode = "400", description = "Invalid id supplied"),
             @ApiResponse(responseCode = "404", description = "Doctor not found")
     })
     @PatchMapping("/{id}")

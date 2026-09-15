@@ -7,7 +7,7 @@ import com.samuelDawid.medical_clinic.dto.doctor.DoctorSummaryDto;
 import com.samuelDawid.medical_clinic.dto.institution.CreateInstitutionCommand;
 import com.samuelDawid.medical_clinic.dto.institution.InstitutionDoctorsDto;
 import com.samuelDawid.medical_clinic.dto.institution.InstitutionDto;
-import com.samuelDawid.medical_clinic.dto.institution.PatchInsitutionCommand;
+import com.samuelDawid.medical_clinic.dto.institution.PatchInstitutionCommand;
 import com.samuelDawid.medical_clinic.exceptions.DoctorNotFoundException;
 import com.samuelDawid.medical_clinic.exceptions.InstitutionAlreadyExistsException;
 import com.samuelDawid.medical_clinic.exceptions.InstitutionNotFoundException;
@@ -244,7 +244,7 @@ class InstitutionServiceTest {
     @Test
     void update_WhenInstitutionExists_ShouldSaveAndReturnInstitutionDto() {
         Long existingId = 1L;
-        PatchInsitutionCommand command = new PatchInsitutionCommand(
+        PatchInstitutionCommand command = new PatchInstitutionCommand(
                 "newName",
                 "newCity",
                 "newPostCode01",
@@ -268,7 +268,7 @@ class InstitutionServiceTest {
     @Test
     void update_WhenInstitutionDoesNotExists_ShouldThrowInstitutionNotFoundException() {
         Long id = 666L;
-        PatchInsitutionCommand command = new PatchInsitutionCommand(null, null, null, null, null);
+        PatchInstitutionCommand command = new PatchInstitutionCommand(null, null, null, null, null);
         when(repository.findById(id)).thenReturn(Optional.empty());
         assertThrows(InstitutionNotFoundException.class,
                 () -> service.update(id, command));
