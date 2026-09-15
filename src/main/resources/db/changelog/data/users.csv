@@ -1,0 +1,7 @@
+id,first_name,last_name,email,password
+1,Jan,Kowalski,jan.kowalski@example.com,pass123
+2,Maria,Wisniewska,maria.wisniewska@example.com,pass123
+3,Tomasz,Lewandowski,tomasz.lewandowski@example.com,pass123
+4,Anna,Nowak,anna.nowak@example.com,pass123
+5,Piotr,Zielinski,piotr.zielinski@example.com,pass123
+6,Katarzyna,Wojcik,katarzyna.wojcik@example.com,pass123
