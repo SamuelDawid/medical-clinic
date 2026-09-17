@@ -1,6 +1,6 @@
 package com.samuelDawid.medical_clinic.dto.institution;
 
-import com.samuelDawid.medical_clinic.model.institution.Address;
+import com.samuelDawid.medical_clinic.dto.AddressDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public record InstitutionDto(
@@ -8,6 +8,6 @@ public record InstitutionDto(
         Long id,
         @Schema(description = "Name", example = "NewCare Clinic")
         String name,
-        Address address
+        AddressDto address
 ) {
 }
