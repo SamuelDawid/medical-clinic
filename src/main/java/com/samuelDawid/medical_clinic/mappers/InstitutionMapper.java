@@ -7,13 +7,16 @@ import com.samuelDawid.medical_clinic.dto.institution.InstitutionDto;
 import com.samuelDawid.medical_clinic.model.institution.Address;
 import com.samuelDawid.medical_clinic.model.institution.Institution;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface InstitutionMapper {
+    @Mapping(target = "id",ignore = true)
+    @Mapping(target = "doctors",ignore = true)
     Institution toEntity(CreateInstitutionCommand command);
 
     InstitutionDto toDto(Institution institution);
-
+    @Mapping(target = "id",ignore = true)
     Address toEntity(CreateAddressCommand command);
 
     AddressDto toDto(Address address);
