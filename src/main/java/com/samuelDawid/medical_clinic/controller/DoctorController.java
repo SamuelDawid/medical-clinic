@@ -3,6 +3,7 @@ package com.samuelDawid.medical_clinic.controller;
 import com.samuelDawid.medical_clinic.dto.PageDto;
 import com.samuelDawid.medical_clinic.dto.doctor.CreateDoctorCommand;
 import com.samuelDawid.medical_clinic.dto.doctor.DoctorDto;
+import com.samuelDawid.medical_clinic.dto.doctor.DoctorSummaryDto;
 import com.samuelDawid.medical_clinic.dto.doctor.PatchDoctorCommand;
 import com.samuelDawid.medical_clinic.service.DoctorService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,6 +30,13 @@ public class DoctorController {
     @GetMapping
     public PageDto<DoctorDto> findAll(@ParameterObject @PageableDefault(size = 20, sort = "id") Pageable pageable) {
         return service.findAll(pageable);
+    }
+
+    @Operation(summary = "Get all doctors")
+    @ApiResponse(description = "Get all doctors", responseCode = "200")
+    @GetMapping("/speciality/{speciality}")
+    public PageDto<DoctorSummaryDto> getAllBySpeciality(@PathVariable String speciality, @ParameterObject @PageableDefault(size = 20, sort = "id") Pageable pageable) {
+        return service.findBySpeciality(speciality, pageable);
     }
 
     @Operation(summary = "Get by id")

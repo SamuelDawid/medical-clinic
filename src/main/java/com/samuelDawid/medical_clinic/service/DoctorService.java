@@ -3,6 +3,7 @@ package com.samuelDawid.medical_clinic.service;
 import com.samuelDawid.medical_clinic.dto.PageDto;
 import com.samuelDawid.medical_clinic.dto.doctor.CreateDoctorCommand;
 import com.samuelDawid.medical_clinic.dto.doctor.DoctorDto;
+import com.samuelDawid.medical_clinic.dto.doctor.DoctorSummaryDto;
 import com.samuelDawid.medical_clinic.dto.doctor.PatchDoctorCommand;
 import com.samuelDawid.medical_clinic.exceptions.DoctorAlreadyExistsException;
 import com.samuelDawid.medical_clinic.exceptions.DoctorNotFoundException;
@@ -42,6 +43,11 @@ public class DoctorService {
     @Transactional(readOnly = true)
     public DoctorDto findById(@NonNull Long id) {
         return mapper.toDto(getDoctorOrThrow(id));
+    }
+
+    @Transactional(readOnly = true)
+    public PageDto<DoctorSummaryDto> findBySpeciality(@NonNull String speciality, Pageable pageable) {
+        return PageDto.from(repository.findBymedicalSpecialty(speciality, pageable));
     }
 
     @Transactional
@@ -86,14 +92,15 @@ public class DoctorService {
 
     private void validateEmail(String email) {
         if (!emailValidator.validate(email)) {
-            log.warn("email : {} not a valid email",email);
+            log.warn("email : {} not a valid email", email);
             throw new InvalidEmailException(email);
         }
         if (userRepository.existsByEmail(email)) {
-            log.warn("user with email {} already exists",email);
+            log.warn("user with email {} already exists", email);
             throw new DoctorAlreadyExistsException();
         }
     }
+
     private Doctor getDoctorOrThrow(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> {

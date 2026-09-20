@@ -1,8 +1,12 @@
 package com.samuelDawid.medical_clinic.repository;
 
+import com.samuelDawid.medical_clinic.dto.doctor.DoctorDto;
+import com.samuelDawid.medical_clinic.dto.doctor.DoctorSummaryDto;
 import com.samuelDawid.medical_clinic.model.Doctor;
 import jakarta.persistence.LockModeType;
 import jakarta.persistence.QueryHint;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
@@ -21,4 +25,5 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
     @QueryHints(value = {@QueryHint(name = "jakarta.persistence.lock.timeout",value = "5000")})
     @Query("SELECT d FROM Doctor d WHERE d.id = :id")
     Optional<Doctor> findByIdForUpdate(@Param("id") Long id);
+    Page<DoctorSummaryDto> findBymedicalSpecialty(String speciality, Pageable pageable);
 }
