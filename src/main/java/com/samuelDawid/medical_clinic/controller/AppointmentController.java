@@ -3,7 +3,10 @@ package com.samuelDawid.medical_clinic.controller;
 import com.samuelDawid.medical_clinic.dto.PageDto;
 import com.samuelDawid.medical_clinic.dto.appointment.AppointmentDto;
 import com.samuelDawid.medical_clinic.dto.appointment.AssignPatientToAppointmentCommand;
+import com.samuelDawid.medical_clinic.dto.appointment.AvailableAppointmentSummary;
 import com.samuelDawid.medical_clinic.dto.appointment.CreateAppointmentCommand;
+import com.samuelDawid.medical_clinic.searchCriteria.AppointmentSearchCriteria;
+import com.samuelDawid.medical_clinic.searchCriteria.AvailableAppointmentCriteria;
 import com.samuelDawid.medical_clinic.service.AppointmentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -29,7 +32,23 @@ public class AppointmentController {
     public PageDto<AppointmentDto> findAll(@ParameterObject @PageableDefault(size = 20, sort = "id") Pageable pageable) {
         return service.findAll(pageable);
     }
+    @Operation(summary = "Search appointments by patient, doctor, specialization, date range or timeframe")
+    @ApiResponse(responseCode = "200", description = "Appointments found")
+    @ApiResponse(responseCode = "400", description = "Invalid filter values")
+    @GetMapping
+    public PageDto<AppointmentDto> search(@ParameterObject AppointmentSearchCriteria criteria,
+            @ParameterObject @PageableDefault(size = 20, sort = "id") Pageable pageable) {
+        return service.search(criteria, pageable);
+    }
 
+    @Operation(summary = "Search available appointment slots (no patient assigned)")
+    @ApiResponse(responseCode = "200", description = "Available slots found")
+    @GetMapping("/available")
+    public PageDto<AvailableAppointmentSummary> searchAvailable(
+            @ParameterObject AvailableAppointmentCriteria criteria,
+            @ParameterObject @PageableDefault(size = 20, sort = "id") Pageable pageable){
+        return service.searchAvailable(criteria,pageable);
+    }
     @Operation(summary = "Get appointment by id")
     @ApiResponse(description = "appointment found", responseCode = "200")
     @ApiResponse(description = "Appointment not found", responseCode = "404")
