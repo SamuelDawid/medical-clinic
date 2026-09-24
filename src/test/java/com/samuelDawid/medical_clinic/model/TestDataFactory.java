@@ -16,6 +16,14 @@ import java.util.List;
 import java.util.Set;
 
 public class TestDataFactory {
+    public static final Long PATIENT_ID = 1L;
+    public static final String PATIENT_NAME = "Piotr Nowak";
+    public static final Long DOCTOR_ID = 1L;
+    public static final String DOCTOR_NAME = "Anna Kowalska";
+    public static final String SPECIALIZATION = "Kardiologia";
+    public static final LocalDateTime FIRST_START = LocalDateTime.of(2026, 9, 15, 15, 30);
+
+
     public static User buildUser(Long id, String firstName, String lastName, String email, String password) {
         User user = new User(firstName, lastName, email, password);
         String normalizedEmail = EmailValidator.normalize(email);

@@ -7,8 +7,10 @@ import com.samuelDawid.medical_clinic.dto.appointment.AssignPatientToAppointment
 import com.samuelDawid.medical_clinic.dto.appointment.CreateAppointmentCommand;
 import com.samuelDawid.medical_clinic.exceptions.*;
 import com.samuelDawid.medical_clinic.model.TestDataFactory;
+import com.samuelDawid.medical_clinic.searchCriteria.AppointmentSearchCriteria;
 import com.samuelDawid.medical_clinic.service.AppointmentService;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,7 +22,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.samuelDawid.medical_clinic.model.TestDataFactory.*;
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -40,23 +45,77 @@ class AppointmentControllerTest {
     List<AppointmentDto> appointmentList = TestDataFactory.threeAppointmentsDto();
 
     @Test
-    void findAll_WhenAppointmentsExists_ShouldReturnPageWithThreeAppointments() throws Exception {
+    void search_WhenNoCriteriaGiven_ShouldReturnPageWithAllAppointments() throws Exception {
         //Given
         PageDto<AppointmentDto> page = new PageDto<>(appointmentList, 0, 20, 3, 1);
-        when(appointmentService.findAll(any(Pageable.class))).thenReturn(page);
+        when(appointmentService.search(any(AppointmentSearchCriteria.class), any(Pageable.class))).thenReturn(page);
+
         //When + Then
-        mockMvc.perform(get("/appointments").param("page", "0").param("size", "20"))
-                .andDo(print())
+        mockMvc.perform(get("/appointments")
+                        .param("page", "0")
+                        .param("size", "20"))
                 .andExpectAll(
                         status().isOk(),
-                        jsonPath("$.content").value(hasSize(3)),
+                        jsonPath("$.content", hasSize(3)),
+                        jsonPath("$.pageNumber").value(0),
+                        jsonPath("$.pageSize").value(20),
+                        jsonPath("$.totalElements").value(3),
+                        jsonPath("$.totalPages").value(1)
+                );
+        verify(appointmentService).search(any(AppointmentSearchCriteria.class), any(Pageable.class));
+    }
+
+    @Test
+    void search_WhenFilteringByPatient_ShouldReturnOnlyAppointmentsOfThatPatient() throws Exception {
+        //Given
+        PageDto<AppointmentDto> page =
+                new PageDto<>(TestDataFactory.threeAppointmentsFotTheSamePatient(PATIENT_NAME), 0, 20, 3, 1);
+        when(appointmentService.search(any(AppointmentSearchCriteria.class), any(Pageable.class)))
+                .thenReturn(page);
+        //When + Then
+        mockMvc.perform(get("/appointments")
+                        .param("patientId", String.valueOf(PATIENT_ID))
+                        .param("page", "0")
+                        .param("size", "20"))
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$.content", hasSize(3)),
                         jsonPath("$.pageNumber").value(0),
                         jsonPath("$.pageSize").value(20),
                         jsonPath("$.totalElements").value(3),
                         jsonPath("$.totalPages").value(1),
-                        jsonPath("$.content[0].id").value(1),
-                        jsonPath("$.content[0].doctorName").value("Anna Kowalska")
+                        jsonPath("$.content[0].patientName").value(PATIENT_NAME)
                 );
+        ArgumentCaptor<AppointmentSearchCriteria> criteriaCaptor = ArgumentCaptor.captor();
+        verify(appointmentService).search(criteriaCaptor.capture(), any(Pageable.class));
+        AppointmentSearchCriteria boundCriteria = criteriaCaptor.getValue();
+        assertEquals(PATIENT_ID, boundCriteria.patientId());
+        assertNull(boundCriteria.doctorId());
+        assertNull(boundCriteria.specialization());
+    }
+
+    @Test
+    void search_WhenFilteringByDoctorAndSpecialization_ShouldReturnMatchingAppointments() throws Exception {
+        //Given
+        PageDto<AppointmentDto> page = new PageDto<>(appointmentList.subList(0, 1), 0, 20, 1, 1);
+        when(appointmentService.search(any(AppointmentSearchCriteria.class), any(Pageable.class))).thenReturn(page);
+        //When + Then
+        mockMvc.perform(get("/appointments")
+                        .param("doctorId", String.valueOf(DOCTOR_ID))
+                        .param("specialization", SPECIALIZATION)
+                        .param("page", "0")
+                        .param("size", "20"))
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$.content", hasSize(1)),
+                        jsonPath("$.totalElements").value(1),
+                        jsonPath("$.totalPages").value(1),
+                        jsonPath("$.content[0].doctorName").value(DOCTOR_NAME)
+                );
+        ArgumentCaptor<AppointmentSearchCriteria> captor = ArgumentCaptor.captor();
+        verify(appointmentService).search(captor.capture(), any(Pageable.class));
+        assertEquals(DOCTOR_ID, captor.getValue().doctorId());
+        assertEquals(SPECIALIZATION, captor.getValue().specialization());
     }
 
     @Test
@@ -127,8 +186,8 @@ class AppointmentControllerTest {
         when(appointmentService.create(command)).thenReturn(appointmentDto);
         //When + Then
         mockMvc.perform(post("/appointments")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(command)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(command)))
                 .andExpectAll(
                         status().isCreated(),
                         jsonPath("$.id").value(1),
