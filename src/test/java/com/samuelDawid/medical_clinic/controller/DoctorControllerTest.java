@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.samuelDawid.medical_clinic.dto.PageDto;
 import com.samuelDawid.medical_clinic.dto.doctor.CreateDoctorCommand;
 import com.samuelDawid.medical_clinic.dto.doctor.DoctorDto;
-import com.samuelDawid.medical_clinic.dto.doctor.DoctorSummaryDto;
 import com.samuelDawid.medical_clinic.dto.doctor.PatchDoctorCommand;
 import com.samuelDawid.medical_clinic.dto.user.CreateUserCommand;
 import com.samuelDawid.medical_clinic.dto.user.PatchUserCommand;
@@ -14,7 +13,6 @@ import com.samuelDawid.medical_clinic.exceptions.InvalidEmailException;
 import com.samuelDawid.medical_clinic.model.TestDataFactory;
 import com.samuelDawid.medical_clinic.service.DoctorService;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -48,7 +46,7 @@ class DoctorControllerTest {
     @Test
     void findAll_WhenDoctorsExists_ShouldReturnPageWithThreeDoctors() throws Exception {
         //Given
-        PageDto<DoctorDto> page = new PageDto<>(doctorDtoList,0,20,3,1);
+        PageDto<DoctorDto> page = new PageDto<>(doctorDtoList, 0, 20, 3, 1);
         when(doctorService.findAll(any(Pageable.class))).thenReturn(page);
         //When + Then
         mockMvc.perform(get("/doctors").param("page", "0").param("size", "20"))
@@ -63,6 +61,7 @@ class DoctorControllerTest {
                         jsonPath("$.content[0].id").value(1)
                 );
     }
+
     @Test
     void findById_WhenDoctorExists_ShouldReturn200() throws Exception {
         //Given
@@ -70,7 +69,7 @@ class DoctorControllerTest {
         DoctorDto doctorDto = doctorDtoList.getFirst();
         when(doctorService.findById(id)).thenReturn(doctorDto);
         //When + Then
-        mockMvc.perform(get("/doctors/{id}",id))
+        mockMvc.perform(get("/doctors/{id}", id))
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$.id").value(1),
@@ -78,19 +77,21 @@ class DoctorControllerTest {
                         jsonPath("$.userDto.firstName").value("Anna")
                 );
     }
+
     @Test
     void findById_WhenDoctorDoesNotExists_ShouldReturn404() throws Exception {
         //Given
         Long id = 666L;
         when(doctorService.findById(id)).thenThrow(new DoctorNotFoundException(id));
         //When + Then
-        mockMvc.perform(get("/doctors/{id}",id))
+        mockMvc.perform(get("/doctors/{id}", id))
                 .andExpectAll(
                         status().isNotFound(),
                         jsonPath("$.message").value("Doctor 666 not found"),
                         jsonPath("$.status").value(404)
                 );
     }
+
     @Test
     void create_ShouldCreateDoctorWhenValid_AndReturn201() throws Exception {
         //Given
@@ -117,8 +118,9 @@ class DoctorControllerTest {
                         jsonPath("$.userDto.firstName").value("Anna")
                 );
     }
+
     @Test
-    void create_WhenProvidedWithInvalidData_ShouldReturn400() throws Exception{
+    void create_WhenProvidedWithInvalidData_ShouldReturn400() throws Exception {
         //Given
         CreateDoctorCommand command = new CreateDoctorCommand(
                 "Kardiologia",
@@ -127,16 +129,17 @@ class DoctorControllerTest {
         when(doctorService.create(command)).thenThrow(new InvalidEmailException(null));
         //When + Then
         mockMvc.perform(post("/doctors")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(command)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(command)))
                 .andExpectAll(
                         status().isBadRequest(),
                         jsonPath("$.message").value("Invalid email: null"),
                         jsonPath("$.status").value(400)
                 );
     }
+
     @Test
-    void update_whenDoctorExists_ShouldReturn200() throws Exception{
+    void update_whenDoctorExists_ShouldReturn200() throws Exception {
         //Given
         Long id = 1L;
         PatchUserCommand patchUserCommand = new PatchUserCommand(
@@ -159,11 +162,11 @@ class DoctorControllerTest {
                 null,
                 userDto
         );
-        when(doctorService.update(id,patchDoctorCommand)).thenReturn(doctorDto);
+        when(doctorService.update(id, patchDoctorCommand)).thenReturn(doctorDto);
         //When + Then
-        mockMvc.perform(patch("/doctors/{id}",id)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(patchDoctorCommand)))
+        mockMvc.perform(patch("/doctors/{id}", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(patchDoctorCommand)))
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$.id").value(1),
@@ -173,40 +176,43 @@ class DoctorControllerTest {
                         jsonPath("$.userDto.email").value("newEmail@example.com")
                 );
     }
+
     @Test
-    void update_WhenDoctorDoesNotExists_ShouldReturn404() throws Exception{
+    void update_WhenDoctorDoesNotExists_ShouldReturn404() throws Exception {
         //Given
         Long id = 666L;
         PatchDoctorCommand patchDoctorCommand = new PatchDoctorCommand(
                 "newSpeciality", null
         );
-        when(doctorService.update(id,patchDoctorCommand)).thenThrow(new DoctorNotFoundException(id));
+        when(doctorService.update(id, patchDoctorCommand)).thenThrow(new DoctorNotFoundException(id));
         //When + Then
-        mockMvc.perform(patch("/doctors/{id}",id)
-                .content(objectMapper.writeValueAsString(patchDoctorCommand))
-                .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(patch("/doctors/{id}", id)
+                        .content(objectMapper.writeValueAsString(patchDoctorCommand))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpectAll(
                         status().isNotFound(),
                         jsonPath("$.message").value("Doctor 666 not found"),
                         jsonPath("$.status").value(404)
                 );
     }
+
     @Test
-    void delete_whenDoctorExists_ShouldReturn204() throws Exception{
+    void delete_whenDoctorExists_ShouldReturn204() throws Exception {
         //Given
         Long id = 1L;
         //When + Then
-        mockMvc.perform(delete("/doctors/{id}",id)).andExpect(status().isNoContent());
+        mockMvc.perform(delete("/doctors/{id}", id)).andExpect(status().isNoContent());
         verify(doctorService).delete(id);
     }
+
     @Test
-    void delete_WhenDoctorDoesNotExists_ShouldReturn404() throws Exception{
+    void delete_WhenDoctorDoesNotExists_ShouldReturn404() throws Exception {
         //Given
         Long id = 666L;
         doThrow(new DoctorNotFoundException(id))
                 .when(doctorService)
                 .delete(id);
-        mockMvc.perform(delete("/doctors/{id}",id))
+        mockMvc.perform(delete("/doctors/{id}", id))
                 .andExpect(status().isNotFound());
         verify(doctorService).delete(id);
     }
