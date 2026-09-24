@@ -14,7 +14,6 @@ import com.samuelDawid.medical_clinic.model.Doctor;
 import com.samuelDawid.medical_clinic.model.User;
 import com.samuelDawid.medical_clinic.repository.DoctorRepository;
 import com.samuelDawid.medical_clinic.repository.UserRepository;
-import com.samuelDawid.medical_clinic.searchCriteria.DoctorSearchCriteria;
 import com.samuelDawid.medical_clinic.validators.EmailValidator;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -55,6 +54,7 @@ public class DoctorService {
                 : repository.findByMedicalSpecialtyIgnoreCase(speciality, pageable);
         return PageDto.from(doctors.map(mapper::toSummaryDto));
     }
+
     @Transactional
     public DoctorDto create(@NonNull CreateDoctorCommand command) {
         log.info("Creating new Doctor");
@@ -97,14 +97,15 @@ public class DoctorService {
 
     private void validateEmail(String email) {
         if (!emailValidator.validate(email)) {
-            log.warn("email : {} not a valid email",email);
+            log.warn("email : {} not a valid email", email);
             throw new InvalidEmailException(email);
         }
         if (userRepository.existsByEmail(email)) {
-            log.warn("user with email {} already exists",email);
+            log.warn("user with email {} already exists", email);
             throw new DoctorAlreadyExistsException();
         }
     }
+
     private Doctor getDoctorOrThrow(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> {
