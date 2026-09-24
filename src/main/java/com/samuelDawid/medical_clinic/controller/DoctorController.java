@@ -3,7 +3,9 @@ package com.samuelDawid.medical_clinic.controller;
 import com.samuelDawid.medical_clinic.dto.PageDto;
 import com.samuelDawid.medical_clinic.dto.doctor.CreateDoctorCommand;
 import com.samuelDawid.medical_clinic.dto.doctor.DoctorDto;
+import com.samuelDawid.medical_clinic.dto.doctor.DoctorSummaryDto;
 import com.samuelDawid.medical_clinic.dto.doctor.PatchDoctorCommand;
+import com.samuelDawid.medical_clinic.searchCriteria.DoctorSearchCriteria;
 import com.samuelDawid.medical_clinic.service.DoctorService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -30,7 +32,14 @@ public class DoctorController {
     public PageDto<DoctorDto> findAll(@ParameterObject @PageableDefault(size = 20, sort = "id") Pageable pageable) {
         return service.findAll(pageable);
     }
-
+    @Operation(summary = "Search doctors by speciality")
+    @ApiResponse(responseCode = "200", description = "Doctors found (empty page if none)")
+    @ApiResponse(responseCode = "503", description = "medical-clinic service unavailable")
+    @GetMapping
+    public PageDto<DoctorSummaryDto> search(@ParameterObject DoctorSearchCriteria criteria,
+            @ParameterObject @PageableDefault(size = 20) Pageable pageable) {
+        return service.search(criteria, pageable);
+    }
     @Operation(summary = "Get by id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Doctor found"),

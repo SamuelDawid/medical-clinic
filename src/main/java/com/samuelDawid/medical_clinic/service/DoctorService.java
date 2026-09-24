@@ -3,6 +3,7 @@ package com.samuelDawid.medical_clinic.service;
 import com.samuelDawid.medical_clinic.dto.PageDto;
 import com.samuelDawid.medical_clinic.dto.doctor.CreateDoctorCommand;
 import com.samuelDawid.medical_clinic.dto.doctor.DoctorDto;
+import com.samuelDawid.medical_clinic.dto.doctor.DoctorSummaryDto;
 import com.samuelDawid.medical_clinic.dto.doctor.PatchDoctorCommand;
 import com.samuelDawid.medical_clinic.exceptions.DoctorAlreadyExistsException;
 import com.samuelDawid.medical_clinic.exceptions.DoctorNotFoundException;
@@ -13,6 +14,7 @@ import com.samuelDawid.medical_clinic.model.Doctor;
 import com.samuelDawid.medical_clinic.model.User;
 import com.samuelDawid.medical_clinic.repository.DoctorRepository;
 import com.samuelDawid.medical_clinic.repository.UserRepository;
+import com.samuelDawid.medical_clinic.searchCriteria.DoctorSearchCriteria;
 import com.samuelDawid.medical_clinic.validators.EmailValidator;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +46,11 @@ public class DoctorService {
         return mapper.toDto(getDoctorOrThrow(id));
     }
 
+    @Transactional(readOnly = true)
+    public PageDto<DoctorSummaryDto> search(DoctorSearchCriteria criteria, Pageable pageable) {
+        log.info("Searching doctors with speciality {}", criteria.speciality());
+        return repository.getDoctorsFromSpecificSpeciality(criteria, pageable);
+    }
     @Transactional
     public DoctorDto create(@NonNull CreateDoctorCommand command) {
         log.info("Creating new Doctor");
