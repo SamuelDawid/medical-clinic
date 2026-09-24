@@ -29,17 +29,11 @@ public class DoctorController {
     @ApiResponse(description = "Get all doctors", responseCode = "200")
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
-    public PageDto<DoctorDto> findAll(@ParameterObject @PageableDefault(size = 20, sort = "id") Pageable pageable) {
-        return service.findAll(pageable);
+    public PageDto<DoctorSummaryDto> findAll(@RequestParam(required = false) String speciality,
+            @ParameterObject @PageableDefault(size = 20, sort = "id") Pageable pageable) {
+        return service.findAll(speciality,pageable);
     }
-    @Operation(summary = "Search doctors by speciality")
-    @ApiResponse(responseCode = "200", description = "Doctors found (empty page if none)")
-    @ApiResponse(responseCode = "503", description = "medical-clinic service unavailable")
-    @GetMapping
-    public PageDto<DoctorSummaryDto> search(@ParameterObject DoctorSearchCriteria criteria,
-            @ParameterObject @PageableDefault(size = 20) Pageable pageable) {
-        return service.search(criteria, pageable);
-    }
+
     @Operation(summary = "Get by id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Doctor found"),

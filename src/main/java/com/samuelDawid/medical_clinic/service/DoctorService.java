@@ -19,6 +19,7 @@ import com.samuelDawid.medical_clinic.validators.EmailValidator;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,9 +48,12 @@ public class DoctorService {
     }
 
     @Transactional(readOnly = true)
-    public PageDto<DoctorSummaryDto> search(DoctorSearchCriteria criteria, Pageable pageable) {
-        log.info("Searching doctors with speciality {}", criteria.speciality());
-        return repository.getDoctorsFromSpecificSpeciality(criteria, pageable);
+    public PageDto<DoctorSummaryDto> findAll(String speciality, Pageable pageable) {
+        log.info("Searching doctors with speciality {}", speciality);
+        Page<Doctor> doctors = (speciality == null || speciality.isBlank())
+                ? repository.findAll(pageable)
+                : repository.findByMedicalSpecialtyIgnoreCase(speciality, pageable);
+        return PageDto.from(doctors.map(mapper::toSummaryDto));
     }
     @Transactional
     public DoctorDto create(@NonNull CreateDoctorCommand command) {

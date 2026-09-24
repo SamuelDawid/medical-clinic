@@ -26,12 +26,6 @@ import org.springframework.web.bind.annotation.*;
 public class AppointmentController {
     private final AppointmentService service;
 
-    @Operation(summary = "Get all appointments")
-    @ApiResponse(description = "Get all appointments", responseCode = "200")
-    @GetMapping
-    public PageDto<AppointmentDto> findAll(@ParameterObject @PageableDefault(size = 20, sort = "id") Pageable pageable) {
-        return service.findAll(pageable);
-    }
     @Operation(summary = "Search appointments by patient, doctor, specialization, date range or timeframe")
     @ApiResponse(responseCode = "200", description = "Appointments found")
     @ApiResponse(responseCode = "400", description = "Invalid filter values")
