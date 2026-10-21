@@ -2,10 +2,6 @@ package com.medicalclinic.adapter.user;
 
 import jakarta.persistence.*;
 import lombok.*;
-import user.CreateUserCommand;
-import user.PatchUserCommand;
-
-import java.util.Objects;
 
 @Entity
 @Getter
@@ -13,7 +9,7 @@ import java.util.Objects;
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "USERS")
-public class User {
+public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,7 +20,7 @@ public class User {
     @ToString.Exclude
     private String password;
 
-    public User(Long id, String firstName, String lastName, String email, String password) {
+    public UserEntity(Long id, String firstName, String lastName, String email, String password) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -35,7 +31,7 @@ public class User {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof User other)) return false;
+        if (!(o instanceof UserEntity other)) return false;
         return id != null && id.equals(other.getId());
     }
 

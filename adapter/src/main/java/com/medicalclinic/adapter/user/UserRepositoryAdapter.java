@@ -21,7 +21,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
 
     @Override
     public PageResult<UserPOJO> findAll(PageQuery pageQuery) {
-        Page<User> page = userJpaRepository.findAll(toPageable(pageQuery));
+        Page<UserEntity> page = userJpaRepository.findAll(toPageable(pageQuery));
         return new PageResult<>(
                 page.getContent().stream().map(mapper::toDomain).toList(),
                 page.getNumber(), page.getSize(), page.getTotalElements(), page.getTotalPages()
@@ -30,8 +30,8 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
 
     @Override
     public UserPOJO save(UserPOJO userPOJO) {
-        User user = mapper.toEntity(userPOJO);
-        User saved = userJpaRepository.save(user);
+        UserEntity user = mapper.toEntity(userPOJO);
+        UserEntity saved = userJpaRepository.save(user);
         return mapper.toDomain(saved);
     }
 

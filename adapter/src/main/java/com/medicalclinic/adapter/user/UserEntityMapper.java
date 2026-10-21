@@ -5,7 +5,7 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "Spring")
 public interface UserEntityMapper {
-    UserPOJO toDomain(User user);
+    UserPOJO toDomain(UserEntity user);
 
-    User toEntity(UserPOJO userPOJO);
+    UserEntity toEntity(UserPOJO userPOJO);
 }

@@ -1,7 +1,7 @@
 package com.medicalclinic.adapter.user;
 
 
-import com.medicalclinic.adapter.page.PageDto;
+import common.ChangePasswordCommand;
 import enums.SortDirection;
 import internalCommands.PageQuery;
 import internalCommands.PageResult;
@@ -11,14 +11,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import models.UserPOJO;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import page.PageDto;
+import user.CreateUserCommand;
 import user.UserDto;
 import user.UserService;
-import user.UserServiceImp;
 
 @RequiredArgsConstructor
 @RestController
@@ -33,8 +36,8 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
     public PageDto<UserDto> findAll(@ParameterObject @PageableDefault(size = 20, sort = "id") Pageable pageable) {
-        PageResult<User> result = userService.findAll(toPageQuerry(pageable));
-        return
+        PageResult<UserPOJO> result = userService.findAll(toPageQuerry(pageable));
+        return PageDto.from(result.map(mapper::toDto));
     }
 
     @Operation(description = "Get User By Id")
@@ -45,7 +48,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{id}")
     public UserDto findById(@NonNull @PathVariable Long id) {
-        return userService.findById(id);
+        return mapper.toDto(userService.findById(id));
     }
 
     @Operation(description = "Create user")
@@ -57,7 +60,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public UserDto create(@RequestBody CreateUserCommand command) {
-        return userService.create(command);
+        return mapper.toDto(userService.create(mapper.toCreateCommand(command)));
     }
 
     @Operation(description = "Change user password")
@@ -69,7 +72,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PatchMapping("/{id}/password")
     public void changePassword(@PathVariable Long id, @RequestBody ChangePasswordCommand command) {
-        userService.changePassword(id, command);
+        userService.changePassword(id, mapper.toChangePasswordCommand(command));
     }
 
     @Operation(description = "Delete user")
@@ -83,7 +86,7 @@ public class UserController {
         userService.deleteUser(id);
     }
 
-    private PageQuery toPageQuerry(Pageable pageable){
+    private PageQuery toPageQuerry(Pageable pageable) {
         Sort.Order order = pageable.getSort().stream().findFirst().orElse(Sort.Order.asc("id"));
         return new PageQuery(pageable.getPageNumber(), pageable.getPageSize(),
                 order.getProperty(), SortDirection.valueOf(order.getDirection().name()));

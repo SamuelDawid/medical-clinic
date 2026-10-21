@@ -33,7 +33,7 @@ public class UserServiceImp implements UserService {
         UserPOJO user = UserPOJO.create(command);
         user.setEmail(emailNormalized);
         UserPOJO saved = userRepository.save(user);
-        log.info("User with Id {} created successfully", user.getId());
+        log.info("User with Id {} created successfully", saved.getId());
         return saved;
     }
 
@@ -46,6 +46,7 @@ public class UserServiceImp implements UserService {
         validatePassword(command.newPassword());
         UserPOJO user = getUserOrThrow(id);
         user.setPassword(command.newPassword());
+        userRepository.save(user);
         log.info("Password changed for User {}", id);
     }
 

@@ -1,5 +1,6 @@
 package user;
 
+import internalCommands.ChangePasswordInternalCommand;
 import internalCommands.PageQuery;
 import internalCommands.PageResult;
 import internalCommands.user.CreateUserInternalCommand;
@@ -11,4 +12,8 @@ public interface UserService {
     UserPOJO create(CreateUserInternalCommand command);
 
     UserPOJO findById(Long id);
+
+    void changePassword(Long id, ChangePasswordInternalCommand command);
+
+    void deleteUser(Long id);
 }
