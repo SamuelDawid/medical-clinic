@@ -1,8 +1,11 @@
 package models;
 
+import internalCommands.appointment.CreateAppointmentInternalCommand;
+import internalCommands.appointment.PatchAppointmentInternalCommand;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 
 @Getter
@@ -18,8 +21,23 @@ public class AppointmentPOJO {
     @ToString.Exclude
     private DoctorPOJO doctor;
 
-
-
+    public static AppointmentPOJO create(CreateAppointmentInternalCommand command, PatientPOJO patient, DoctorPOJO doctor) {
+        return AppointmentPOJO.builder()
+                .id(null)
+                .startDateTime(command.startDateTime())
+                .endDateTime(command.endDateTime())
+                .patient(patient)
+                .doctor(doctor)
+                .build();
+    }
+    public void updateTimeofTheAppointment(PatchAppointmentInternalCommand command){
+        if(Objects.nonNull(command.startTime())){
+            this.startDateTime = command.startTime();
+        }
+        if(Objects.nonNull(command.endTime())){
+            this.endDateTime = command.endTime();
+        }
+    }
     @Override
     public boolean equals(Object o){
         if(this == o) {return true;}

@@ -1,46 +1,49 @@
 package models.institution;
 
+import internalCommands.institution.CreateInstitutionInternalCommand;
+import internalCommands.institution.PatchInstitutionInternalCommand;
 import lombok.*;
 
-import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 
 @Getter
 @Setter
 @ToString
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class InstitutionPOJO {
     private Long id;
     private String name;
     private AddressPOJO address;
     @ToString.Exclude
-    private Set<Doctor> doctors = new HashSet<>();
+    private Set<Long> doctors;
 
-    public InstitutionPOJO(String name, AddressPOJO address, Set<Doctor> doctors) {
-        this.name = name;
-        this.address = address;
-        this.doctors = doctors;
+    public static InstitutionPOJO create(CreateInstitutionInternalCommand command) {
+        return InstitutionPOJO.builder()
+                .id(null)
+                .name(command.name())
+                .address(AddressPOJO.create(command.address()))
+                .build();
     }
 
-    public void update(@NonNull PatchInstitutionCommand command) {
-        if (command.name() != null) {
+    public void update(PatchInstitutionInternalCommand command) {
+        if (Objects.nonNull(command.name())) {
             this.setName(command.name());
         }
-        if (command.city() != null) {
-            this.getAddress()
-                    .setCity(command.city());
+        if (Objects.nonNull(command.city())) {
+            this.getAddress().setCity(command.city());
         }
-        if (command.buildingNumber() != null) {
-            this.getAddress()
-                    .setBuildingNumber(command.buildingNumber());
+        if (Objects.nonNull(command.buildingNumber())) {
+            this.getAddress().setBuildingNumber(command.buildingNumber());
         }
-        if (command.postCode() != null) {
-            this.getAddress()
-                    .setPostCode(command.postCode());
+        if (Objects.nonNull(command.postCode())) {
+            this.getAddress().setPostCode(command.postCode());
         }
-        if (command.street() != null) {
-            this.getAddress()
-                    .setStreet(command.street());
+        if (Objects.nonNull(command.street())) {
+            this.getAddress().setStreet(command.street());
         }
     }
 

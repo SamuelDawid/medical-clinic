@@ -1,37 +1,44 @@
 package models;
 
+import internalCommands.doctor.CreateDoctorInternalCommand;
+import internalCommands.doctor.PatchDoctorInternalCommand;
 import lombok.*;
-import models.institution.InstitutionPOJO;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 
 @Getter
 @Setter
 @ToString
-
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class DoctorPOJO {
     private Long id;
     private String medicalSpecialty;
     @ToString.Exclude
-    private Set<InstitutionPOJO> institutions = new HashSet<>();
+    private Set<Long> institutionsId = new HashSet<>();
     @ToString.Exclude
     private UserPOJO user;
 
-    public DoctorPOJO(String medicalSpecialty, UserPOJO user) {
-        this.medicalSpecialty = medicalSpecialty;
-        this.user = user;
+    public static DoctorPOJO create(CreateDoctorInternalCommand command) {
+        return DoctorPOJO.builder()
+                .id(null)
+                .medicalSpecialty(command.medicalSpecialty())
+                .institutionsId(command.institutionId())
+                .user(UserPOJO.create(command.user()))
+                .build();
     }
 
-    public void update(@NonNull PatchDoctorCommand command, UserPatcher userPatcher) {
-        if (command.medicalSpecialty() != null) {
+    public void update(PatchDoctorInternalCommand command) {
+        if (Objects.nonNull(command.medicalSpecialty())) {
             this.setMedicalSpecialty(command.medicalSpecialty());
         }
-        if (command.user() != null) {
-            userPatcher.apply(command.user(), this.getUser());
+        if (Objects.nonNull(command.user())) {
+            this.user.update(command.user());
         }
-
     }
 
     @Override
