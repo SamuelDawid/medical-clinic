@@ -1,8 +1,11 @@
 package models;
 
+import internalCommands.patient.CreatePatientInternalCommand;
+import internalCommands.patient.PatchPatientInternalCommand;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -17,20 +20,27 @@ public class PatientPOJO {
     @ToString.Exclude
     private UserPOJO user;
 
-
-
-    public void update(@NonNull PatchPatientCommand patientCommand, UserPatcher userPatcher) {
-        if (patientCommand.idCardNo() != null) {
+    public static PatientPOJO create(@NonNull CreatePatientInternalCommand command){
+        UserPOJO user = UserPOJO.create(command.user());
+        return PatientPOJO.builder()
+                .id(null)
+                .idCardNo(command.idCardNo())
+                .birthDay(command.birthDay())
+                .phoneNumber(command.phoneNumber())
+                .user(user).build();
+    }
+    public void update(@NonNull PatchPatientInternalCommand patientCommand) {
+        if (Objects.nonNull(patientCommand.idCardNo())) {
             this.setIdCardNo(patientCommand.idCardNo());
         }
-        if (patientCommand.birthDay() != null) {
+        if (Objects.nonNull(patientCommand.birthDay())) {
             this.setBirthDay(patientCommand.birthDay());
         }
-        if (patientCommand.phoneNumber() != null) {
+        if (Objects.nonNull(patientCommand.phoneNumber())) {
             this.setPhoneNumber(patientCommand.phoneNumber());
         }
-        if (patientCommand.user() != null) {
-            userPatcher.apply(patientCommand.user(), this.getUser());
+        if (Objects.nonNull(patientCommand.user())) {
+            this.user.update(patientCommand.user());
         }
     }
 

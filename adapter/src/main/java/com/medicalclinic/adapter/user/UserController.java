@@ -1,9 +1,8 @@
 package com.medicalclinic.adapter.user;
 
 
+import com.medicalclinic.adapter.AdapterControllerCommon;
 import common.ChangePasswordCommand;
-import enums.SortDirection;
-import internalCommands.PageQuery;
 import internalCommands.PageResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import models.UserPOJO;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +34,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
     public PageDto<UserDto> findAll(@ParameterObject @PageableDefault(size = 20, sort = "id") Pageable pageable) {
-        PageResult<UserPOJO> result = userService.findAll(toPageQuerry(pageable));
+        PageResult<UserPOJO> result = userService.findAll(AdapterControllerCommon.toPageQuerry(pageable));
         return PageDto.from(result.map(mapper::toDto));
     }
 
@@ -86,9 +84,5 @@ public class UserController {
         userService.deleteUser(id);
     }
 
-    private PageQuery toPageQuerry(Pageable pageable) {
-        Sort.Order order = pageable.getSort().stream().findFirst().orElse(Sort.Order.asc("id"));
-        return new PageQuery(pageable.getPageNumber(), pageable.getPageSize(),
-                order.getProperty(), SortDirection.valueOf(order.getDirection().name()));
-    }
+
 }

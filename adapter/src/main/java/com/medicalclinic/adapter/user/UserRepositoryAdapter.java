@@ -1,13 +1,11 @@
 package com.medicalclinic.adapter.user;
 
+import com.medicalclinic.adapter.AdapterControllerCommon;
 import internalCommands.PageQuery;
 import internalCommands.PageResult;
 import lombok.RequiredArgsConstructor;
 import models.UserPOJO;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import user.UserRepositoryPort;
 
@@ -21,7 +19,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
 
     @Override
     public PageResult<UserPOJO> findAll(PageQuery pageQuery) {
-        Page<UserEntity> page = userJpaRepository.findAll(toPageable(pageQuery));
+        Page<UserEntity> page = userJpaRepository.findAll(AdapterControllerCommon.toPageable(pageQuery));
         return new PageResult<>(
                 page.getContent().stream().map(mapper::toDomain).toList(),
                 page.getNumber(), page.getSize(), page.getTotalElements(), page.getTotalPages()
@@ -50,8 +48,4 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
         userJpaRepository.deleteById(id);
     }
 
-    private Pageable toPageable(PageQuery query) {
-        Sort sort = Sort.by(Sort.Direction.valueOf(query.direction().name()), query.sortBy());
-        return PageRequest.of(query.page(), query.size(), sort);
-    }
 }

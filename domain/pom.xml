@@ -36,6 +36,7 @@
             <artifactId>slf4j-simple</artifactId>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 
 </project>
