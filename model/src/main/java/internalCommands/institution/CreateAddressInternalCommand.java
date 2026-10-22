@@ -1,4 +1,4 @@
-package internalCommands;
+package internalCommands.institution;
 
 public record CreateAddressInternalCommand(
         String city,
