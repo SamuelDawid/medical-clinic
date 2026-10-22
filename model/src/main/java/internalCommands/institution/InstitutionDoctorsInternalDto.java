@@ -1,11 +1,12 @@
 package internalCommands.institution;
 
-import internalCommands.doctor.DoctorSummaryInternalDto;
+import models.DoctorPOJO;
+import models.institution.InstitutionPOJO;
 
 import java.util.Set;
 
 public record InstitutionDoctorsInternalDto(
-        String institutionName,
-        Set<DoctorSummaryInternalDto> doctorsDto
+        InstitutionPOJO institution,
+        Set<DoctorPOJO> doctorsDto
 ) {
 }

@@ -1,6 +1,9 @@
 package com.medicalclinic.adapter;
 
 
+import affiliationService.AffiliationService;
+import doctor.DoctorRepositoryPort;
+import institution.InstitutionRepositoryPort;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import org.springframework.context.annotation.Bean;
@@ -40,6 +43,10 @@ public class DomainConfiguration {
                         .description("API for managing patients at the medical clinic")
         );
     }
-
+    @Bean
+    public AffiliationService affiliationService(DoctorRepositoryPort doctorRepository,
+            InstitutionRepositoryPort institutionRepository) {
+        return new AffiliationService(doctorRepository, institutionRepository);
+    }
 
 }
