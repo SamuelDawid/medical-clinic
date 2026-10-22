@@ -28,7 +28,7 @@ public class DoctorPOJO {
         return DoctorPOJO.builder()
                 .id(null)
                 .medicalSpecialty(command.medicalSpecialty())
-                .institutionsId(command.institutionId())
+                .institutionsId(new HashSet<>())
                 .user(UserPOJO.create(command.user()))
                 .build();
     }

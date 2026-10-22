@@ -1,6 +1,7 @@
 package com.medicalclinic.adapter.doctor;
 
 import com.medicalclinic.adapter.AdapterControllerCommon;
+import com.medicalclinic.adapter.institution.InstitutionJpaRepository;
 import doctor.DoctorRepositoryPort;
 import internalCommandsAndDtos.PageQuery;
 import internalCommandsAndDtos.PageResult;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 public class DoctorRepositoryAdapter implements DoctorRepositoryPort {
     private final DoctorJpaRepository jpaRepository;
     private final DoctorEntityMapper mapper;
+    private final InstitutionJpaRepository institutionJpaRepository;
 
     @Override
     public PageResult<DoctorPOJO> findAll(PageQuery pageQuery) {
@@ -30,13 +32,12 @@ public class DoctorRepositoryAdapter implements DoctorRepositoryPort {
     }
 
     @Override
-    public Set<DoctorPOJO> findByInstitutionsId(Long institutionId) {
-        return jpaRepository.findByInstitutionsId(institutionId).stream().map(mapper::toDomain).collect(Collectors.toSet());
-    }
-
-    @Override
-    public DoctorPOJO save(DoctorPOJO doctorPOJO) {
-        return mapper.toDomain(jpaRepository.save(mapper.toEntity(doctorPOJO)));
+    public DoctorPOJO save(DoctorPOJO doctor) {
+        DoctorEntity entity = mapper.toEntity(doctor);
+        entity.setInstitutions(doctor.getInstitutionsId().stream()
+                .map(institutionJpaRepository::getReferenceById)
+                .collect(Collectors.toSet()));
+        return mapper.toDomain(jpaRepository.save(entity));
     }
 
     @Override
@@ -75,7 +76,6 @@ public class DoctorRepositoryAdapter implements DoctorRepositoryPort {
 
     @Override
     public void saveAll(Set<DoctorPOJO> doctors) {
-        Set<DoctorEntity> set = doctors.stream().map(mapper::toEntity).collect(Collectors.toSet());
-        jpaRepository.saveAll(set);
+        doctors.forEach(this::save);
     }
 }

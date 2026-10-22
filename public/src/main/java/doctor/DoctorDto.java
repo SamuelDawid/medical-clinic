@@ -1,6 +1,5 @@
 package doctor;
 
-import institution.InstitutionDto;
 import user.UserDto;
 
 import java.util.Set;
@@ -8,7 +7,7 @@ import java.util.Set;
 public record DoctorDto(
         Long id,
         String medicalSpecialty,
-        Set<InstitutionDto> institutionDto,
+        Set<Long> institutionDto,
         UserDto userDto
 ) {
 }

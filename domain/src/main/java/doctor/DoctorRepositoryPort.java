@@ -9,7 +9,6 @@ import java.util.Set;
 
 public interface DoctorRepositoryPort {
     PageResult<DoctorPOJO> findAll(PageQuery pageQuery);
-    Set<DoctorPOJO> findByInstitutionsId(Long institutionId);
     DoctorPOJO save(DoctorPOJO doctorPOJO);
     Optional<DoctorPOJO> findByIdForUpdate(Long id);
     Optional<DoctorPOJO> findById(Long id);

@@ -58,7 +58,7 @@ public class DoctorServiceImp implements DoctorService{
         DoctorPOJO doctor = getDoctorOrThrow(id);
         doctor.update(command);
         log.info("Doctor {} updated successfully", id);
-        return doctor;
+        return repository.save(doctor);
     }
 
     public void delete(@NonNull Long id) {
