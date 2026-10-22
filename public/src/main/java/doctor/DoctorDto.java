@@ -7,7 +7,7 @@ import java.util.Set;
 public record DoctorDto(
         Long id,
         String medicalSpecialty,
-        Set<Long> institutionDto,
+        Set<Long> institutionIds,
         UserDto userDto
 ) {
 }

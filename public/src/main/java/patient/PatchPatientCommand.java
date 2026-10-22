@@ -2,7 +2,6 @@ package patient;
 
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.mapstruct.Mapping;
 import user.PatchUserCommand;
 
 import java.time.LocalDate;
@@ -17,7 +16,6 @@ public record PatchPatientCommand(
         @Schema(description = "Phone number", example = "+48 609567865",
                 requiredMode = Schema.RequiredMode.REQUIRED)
         String phoneNumber,
-        @Mapping(target = "user")
         PatchUserCommand user
 ) {
 }

@@ -1,8 +1,7 @@
 package patient;
 
-
-import com.samuelDawid.medical_clinic.dto.user.UserDto;
 import io.swagger.v3.oas.annotations.media.Schema;
+import user.UserDto;
 
 import java.time.LocalDate;
 
