@@ -1,7 +1,7 @@
 package models;
 
-import internalCommands.patient.CreatePatientInternalCommand;
-import internalCommands.patient.PatchPatientInternalCommand;
+import internalCommandsAndDtos.patient.CreatePatientInternalCommand;
+import internalCommandsAndDtos.patient.PatchPatientInternalCommand;
 import lombok.*;
 
 import java.time.LocalDate;

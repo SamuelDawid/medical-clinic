@@ -1,6 +1,6 @@
-package internalCommands.patient;
+package internalCommandsAndDtos.patient;
 
-import internalCommands.user.PatchUserInternalCommand;
+import internalCommandsAndDtos.user.PatchUserInternalCommand;
 import org.mapstruct.Mapping;
 
 import java.time.LocalDate;

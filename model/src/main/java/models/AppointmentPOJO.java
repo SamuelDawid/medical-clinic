@@ -1,7 +1,7 @@
 package models;
 
-import internalCommands.appointment.CreateAppointmentInternalCommand;
-import internalCommands.appointment.PatchAppointmentInternalCommand;
+import internalCommandsAndDtos.appointment.CreateAppointmentInternalCommand;
+import internalCommandsAndDtos.appointment.PatchAppointmentInternalCommand;
 import lombok.*;
 
 import java.time.LocalDateTime;

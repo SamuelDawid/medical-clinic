@@ -1,7 +1,7 @@
 package institution;
 
-import internalCommands.PageQuery;
-import internalCommands.PageResult;
+import internalCommandsAndDtos.PageQuery;
+import internalCommandsAndDtos.PageResult;
 import models.institution.InstitutionPOJO;
 
 import java.util.Optional;

@@ -1,9 +1,9 @@
 package patient;
 
-import internalCommands.PageQuery;
-import internalCommands.PageResult;
-import internalCommands.patient.CreatePatientInternalCommand;
-import internalCommands.patient.PatchPatientInternalCommand;
+import internalCommandsAndDtos.PageQuery;
+import internalCommandsAndDtos.PageResult;
+import internalCommandsAndDtos.patient.CreatePatientInternalCommand;
+import internalCommandsAndDtos.patient.PatchPatientInternalCommand;
 import models.PatientPOJO;
 
 public interface PatientService {

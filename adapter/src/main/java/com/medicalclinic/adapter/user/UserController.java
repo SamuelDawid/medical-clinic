@@ -3,7 +3,7 @@ package com.medicalclinic.adapter.user;
 
 import com.medicalclinic.adapter.AdapterControllerCommon;
 import common.ChangePasswordCommand;
-import internalCommands.PageResult;
+import internalCommandsAndDtos.PageResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

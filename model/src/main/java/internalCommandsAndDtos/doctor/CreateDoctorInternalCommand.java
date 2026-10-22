@@ -1,6 +1,6 @@
-package internalCommands.doctor;
+package internalCommandsAndDtos.doctor;
 
-import internalCommands.user.CreateUserInternalCommand;
+import internalCommandsAndDtos.user.CreateUserInternalCommand;
 
 import java.util.Set;
 

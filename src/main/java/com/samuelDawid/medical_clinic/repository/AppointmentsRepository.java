@@ -25,7 +25,6 @@ public interface AppointmentsRepository extends JpaRepository<Appointment, Long>
     Set<Appointment> findByDoctorAndStartDateTimeLessThanAndEndDateTimeGreaterThan(Doctor doctor,
                                                                            LocalDateTime newEnd,
                                                                            LocalDateTime newStart
-
     );
 
 }

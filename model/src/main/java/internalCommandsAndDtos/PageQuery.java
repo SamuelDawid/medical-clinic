@@ -1,4 +1,4 @@
-package internalCommands;
+package internalCommandsAndDtos;
 
 import enums.SortDirection;
 

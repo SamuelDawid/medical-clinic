@@ -1,9 +1,9 @@
 package user;
 
-import internalCommands.ChangePasswordInternalCommand;
-import internalCommands.PageQuery;
-import internalCommands.PageResult;
-import internalCommands.user.CreateUserInternalCommand;
+import internalCommandsAndDtos.ChangePasswordInternalCommand;
+import internalCommandsAndDtos.PageQuery;
+import internalCommandsAndDtos.PageResult;
+import internalCommandsAndDtos.user.CreateUserInternalCommand;
 import models.UserPOJO;
 
 public interface UserService {

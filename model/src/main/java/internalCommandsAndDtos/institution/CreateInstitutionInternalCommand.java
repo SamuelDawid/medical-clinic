@@ -1,4 +1,4 @@
-package internalCommands.institution;
+package internalCommandsAndDtos.institution;
 
 
 public record CreateInstitutionInternalCommand(

@@ -1,4 +1,4 @@
-package internalCommands.user;
+package internalCommandsAndDtos.user;
 
 public record CreateUserInternalCommand(
          String firstName,

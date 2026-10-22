@@ -1,7 +1,7 @@
 package patient;
 
-import internalCommands.PageQuery;
-import internalCommands.PageResult;
+import internalCommandsAndDtos.PageQuery;
+import internalCommandsAndDtos.PageResult;
 import models.PatientPOJO;
 
 import java.util.Optional;

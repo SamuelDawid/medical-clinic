@@ -1,7 +1,7 @@
 package com.medicalclinic.adapter.patient;
 
-import internalCommands.patient.CreatePatientInternalCommand;
-import internalCommands.patient.PatchPatientInternalCommand;
+import internalCommandsAndDtos.patient.CreatePatientInternalCommand;
+import internalCommandsAndDtos.patient.PatchPatientInternalCommand;
 import models.PatientPOJO;
 import org.mapstruct.Mapper;
 import patient.CreatePatientCommand;

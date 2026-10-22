@@ -1,10 +1,10 @@
 package institution;
 
-import internalCommands.PageQuery;
-import internalCommands.PageResult;
-import internalCommands.institution.CreateInstitutionInternalCommand;
-import internalCommands.institution.InstitutionDoctorsInternalDto;
-import internalCommands.institution.PatchInstitutionInternalCommand;
+import internalCommandsAndDtos.PageQuery;
+import internalCommandsAndDtos.PageResult;
+import internalCommandsAndDtos.institution.CreateInstitutionInternalCommand;
+import internalCommandsAndDtos.institution.InstitutionDoctorsInternalDto;
+import internalCommandsAndDtos.institution.PatchInstitutionInternalCommand;
 import models.DoctorPOJO;
 import models.institution.InstitutionPOJO;
 

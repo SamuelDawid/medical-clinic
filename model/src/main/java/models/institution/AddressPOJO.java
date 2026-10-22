@@ -1,7 +1,7 @@
 package models.institution;
 
-import internalCommands.institution.CreateAddressInternalCommand;
-import internalCommands.institution.PatchAddressInternalCommand;
+import internalCommandsAndDtos.institution.CreateAddressInternalCommand;
+import internalCommandsAndDtos.institution.PatchAddressInternalCommand;
 import lombok.*;
 
 import java.util.Objects;

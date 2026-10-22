@@ -4,7 +4,7 @@ import doctor.DoctorRepositoryPort;
 import exceptions.DoctorNotFoundException;
 import exceptions.InstitutionNotFoundException;
 import institution.InstitutionRepositoryPort;
-import internalCommands.institution.InstitutionDoctorsInternalDto;
+import internalCommandsAndDtos.institution.InstitutionDoctorsInternalDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import models.DoctorPOJO;

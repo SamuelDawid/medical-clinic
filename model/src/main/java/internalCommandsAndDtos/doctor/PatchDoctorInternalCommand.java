@@ -1,6 +1,6 @@
-package internalCommands.doctor;
+package internalCommandsAndDtos.doctor;
 
-import internalCommands.user.PatchUserInternalCommand;
+import internalCommandsAndDtos.user.PatchUserInternalCommand;
 import org.mapstruct.Mapping;
 
 public record PatchDoctorInternalCommand(

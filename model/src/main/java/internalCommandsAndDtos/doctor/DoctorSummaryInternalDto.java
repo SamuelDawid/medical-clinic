@@ -1,4 +1,4 @@
-package internalCommands.doctor;
+package internalCommandsAndDtos.doctor;
 
 public record DoctorSummaryInternalDto(
         String firstName,

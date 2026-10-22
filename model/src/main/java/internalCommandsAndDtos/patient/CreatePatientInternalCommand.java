@@ -1,7 +1,7 @@
-package internalCommands.patient;
+package internalCommandsAndDtos.patient;
 
 
-import internalCommands.user.CreateUserInternalCommand;
+import internalCommandsAndDtos.user.CreateUserInternalCommand;
 import org.mapstruct.Mapping;
 
 import java.time.LocalDate;

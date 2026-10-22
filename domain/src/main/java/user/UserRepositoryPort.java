@@ -1,7 +1,7 @@
 package user;
 
-import internalCommands.PageQuery;
-import internalCommands.PageResult;
+import internalCommandsAndDtos.PageQuery;
+import internalCommandsAndDtos.PageResult;
 import models.UserPOJO;
 
 import java.util.Optional;

@@ -1,4 +1,4 @@
-package internalCommands.appointment;
+package internalCommandsAndDtos.appointment;
 
 public record AssignPatientToAppointmentInternalCommand(
         Long patientId,

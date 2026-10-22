@@ -1,7 +1,7 @@
 package com.medicalclinic.adapter;
 
 import enums.SortDirection;
-import internalCommands.PageQuery;
+import internalCommandsAndDtos.PageQuery;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

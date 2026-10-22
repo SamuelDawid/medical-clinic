@@ -1,7 +1,7 @@
 package models;
 
-import internalCommands.doctor.CreateDoctorInternalCommand;
-import internalCommands.doctor.PatchDoctorInternalCommand;
+import internalCommandsAndDtos.doctor.CreateDoctorInternalCommand;
+import internalCommandsAndDtos.doctor.PatchDoctorInternalCommand;
 import lombok.*;
 
 import java.util.HashSet;

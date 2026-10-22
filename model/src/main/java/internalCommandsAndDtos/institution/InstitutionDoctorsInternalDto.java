@@ -1,4 +1,4 @@
-package internalCommands.institution;
+package internalCommandsAndDtos.institution;
 
 import models.DoctorPOJO;
 import models.institution.InstitutionPOJO;

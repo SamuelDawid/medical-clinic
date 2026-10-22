@@ -1,8 +1,8 @@
 package com.medicalclinic.adapter.user;
 
 import com.medicalclinic.adapter.AdapterControllerCommon;
-import internalCommands.PageQuery;
-import internalCommands.PageResult;
+import internalCommandsAndDtos.PageQuery;
+import internalCommandsAndDtos.PageResult;
 import lombok.RequiredArgsConstructor;
 import models.UserPOJO;
 import org.springframework.data.domain.Page;

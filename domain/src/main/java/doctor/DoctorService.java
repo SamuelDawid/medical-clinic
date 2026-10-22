@@ -1,9 +1,9 @@
 package doctor;
 
-import internalCommands.PageQuery;
-import internalCommands.PageResult;
-import internalCommands.doctor.CreateDoctorInternalCommand;
-import internalCommands.doctor.PatchDoctorInternalCommand;
+import internalCommandsAndDtos.PageQuery;
+import internalCommandsAndDtos.PageResult;
+import internalCommandsAndDtos.doctor.CreateDoctorInternalCommand;
+import internalCommandsAndDtos.doctor.PatchDoctorInternalCommand;
 import models.DoctorPOJO;
 
 public interface DoctorService {

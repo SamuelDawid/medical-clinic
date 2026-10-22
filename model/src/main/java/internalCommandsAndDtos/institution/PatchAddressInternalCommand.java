@@ -1,7 +1,6 @@
-package internalCommands.institution;
+package internalCommandsAndDtos.institution;
 
-public record PatchInstitutionInternalCommand(
-        String name,
+public record PatchAddressInternalCommand(
         String city,
         String postCode,
         String street,

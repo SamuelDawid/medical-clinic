@@ -1,7 +1,7 @@
 package models;
 
-import internalCommands.user.CreateUserInternalCommand;
-import internalCommands.user.PatchUserInternalCommand;
+import internalCommandsAndDtos.user.CreateUserInternalCommand;
+import internalCommandsAndDtos.user.PatchUserInternalCommand;
 import lombok.*;
 
 import java.util.Objects;
