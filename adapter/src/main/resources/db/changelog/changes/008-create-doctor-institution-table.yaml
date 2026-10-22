@@ -1,0 +1,41 @@
+databaseChangeLog:
+  - changeSet:
+      id: 008-create-doctor-institution-table
+      author: Samuel Dawid
+      comment: "Join table for the many-to-many relation between doctor and institution"
+      changes:
+        - createTable:
+            tableName: doctor_institution
+            columns:
+              - column:
+                  name: doctor_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: institution_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            tableName: doctor_institution
+            columnNames: doctor_id, institution_id
+            constraintName: pk_doctor_institution
+
+  - changeSet:
+      id: 008.1-add-doctor-institution-foreign-keys
+      author: Samuel Dawid
+      comment: "Link the join table to doctor and institution"
+      changes:
+        - addForeignKeyConstraint:
+            constraintName: fk_doctor_institution_doctor
+            baseTableName: doctor_institution
+            baseColumnNames: doctor_id
+            referencedTableName: doctor
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            constraintName: fk_doctor_institution_institution
+            baseTableName: doctor_institution
+            baseColumnNames: institution_id
+            referencedTableName: institution
+            referencedColumnNames: id

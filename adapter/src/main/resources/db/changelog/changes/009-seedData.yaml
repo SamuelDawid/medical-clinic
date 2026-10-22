@@ -1,0 +1,58 @@
+databaseChangeLog:
+  - changeSet:
+      id: 009-seed-users
+      author: Samuel Dawid
+      context: dev
+      changes:
+        - loadData:
+            tableName: users
+            file: db/changelog/data/users.csv
+            relativeToChangelogFile: false
+            columns:
+              - column: {name: id, type: NUMERIC}
+              - column: {name: first_name, type: STRING}
+              - column: {name: last_name, type: STRING}
+              - column: {name: email, type: STRING}
+              - column: {name: password, type: STRING}
+
+  - changeSet:
+      id: 010-seed-patients
+      author: samuel
+      context: dev
+      changes:
+        - loadData:
+            tableName: patient
+            file: db/changelog/data/patients.csv
+            relativeToChangelogFile: false
+            columns:
+              - column: {name: id, type: NUMERIC}
+              - column: {name: id_card_no, type: STRING}
+              - column: {name: birth_day, type: DATE}
+              - column: {name: phone_number, type: STRING}
+              - column: {name: user_id, type: NUMERIC}
+
+  - changeSet:
+      id: 011-seed-doctors
+      author: samuel
+      context: dev
+      changes:
+        - loadData:
+            tableName: doctor
+            file: db/changelog/data/doctors.csv
+            relativeToChangelogFile: false
+            columns:
+              - column: {name: id, type: NUMERIC}
+              - column: {name: medical_specialty, type: STRING}
+              - column: {name: user_id, type: NUMERIC}
+
+  - changeSet:
+      id: 012-restart-identity
+      author: samuel
+      context: dev
+      changes:
+        - sql:
+            sql: ALTER TABLE users ALTER COLUMN id RESTART WITH 100
+        - sql:
+            sql: ALTER TABLE patient ALTER COLUMN id RESTART WITH 100
+        - sql:
+            sql: ALTER TABLE doctor ALTER COLUMN id RESTART WITH 100
