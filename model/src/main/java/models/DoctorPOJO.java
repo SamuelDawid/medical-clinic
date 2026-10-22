@@ -19,6 +19,7 @@ public class DoctorPOJO {
     private Long id;
     private String medicalSpecialty;
     @ToString.Exclude
+    @Builder.Default
     private Set<Long> institutionsId = new HashSet<>();
     @ToString.Exclude
     private UserPOJO user;
@@ -39,6 +40,14 @@ public class DoctorPOJO {
         if (Objects.nonNull(command.user())) {
             this.user.update(command.user());
         }
+    }
+
+    public void addInstitutions(Set<Long> ids) {
+        this.institutionsId.addAll(ids);
+    }
+
+    public void addInstitution(Long id) {
+        this.institutionsId.add(id);
     }
 
     @Override
