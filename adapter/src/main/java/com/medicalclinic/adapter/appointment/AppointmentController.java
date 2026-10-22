@@ -1,99 +1,111 @@
 package com.medicalclinic.adapter.appointment;
 
-import com.samuelDawid.medical_clinic.dto.PageDto;
-import com.samuelDawid.medical_clinic.dto.appointment.AppointmentDto;
-import com.samuelDawid.medical_clinic.dto.appointment.AssignPatientToAppointmentCommand;
-import com.samuelDawid.medical_clinic.dto.appointment.AvailableAppointmentSummary;
-import com.samuelDawid.medical_clinic.dto.appointment.CreateAppointmentCommand;
-import com.samuelDawid.medical_clinic.searchCriteria.AppointmentSearchCriteria;
-import com.samuelDawid.medical_clinic.searchCriteria.AvailableAppointmentCriteria;
-import com.samuelDawid.medical_clinic.service.AppointmentService;
+import appointment.AppointmentDto;
+import appointment.AppointmentService;
+import appointment.AssignPatientToAppointmentCommand;
+import appointment.AvailableAppointmentSummary;
+import appointment.CreateAppointmentCommand;
+import com.medicalclinic.adapter.AdapterControllerCommon;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import page.PageDto;
 
-@Tag(name = "Appointments", description = "Operations for managing Appointments records")
+@Tag(name = "Appointments", description = "Operations for managing appointments")
 @RequiredArgsConstructor
 @RequestMapping("/appointments")
-@RestController()
+@RestController
 public class AppointmentController {
     private final AppointmentService service;
+    private final AppointmentWebMapper mapper;
 
-    @Operation(summary = "Search appointments by patient, doctor, specialization, date range or timeframe")
-    @ApiResponse(responseCode = "200", description = "Appointments found")
-    @ApiResponse(responseCode = "400", description = "Invalid filter values")
+    @Operation(summary = "Search appointments by criteria")
+    @ApiResponse(responseCode = "200", description = "Matching appointments")
     @GetMapping
-    public PageDto<AppointmentDto> search(@ParameterObject AppointmentSearchCriteria criteria,
+    public PageDto<AppointmentDto> search(@ParameterObject AppointmentSearchParams params,
             @ParameterObject @PageableDefault(size = 20, sort = "id") Pageable pageable) {
-        return service.search(criteria, pageable);
+        return PageDto.from(service.search(mapper.toCriteria(params), AdapterControllerCommon.toPageQuerry(pageable))
+                .map(mapper::toDto));
     }
 
-    @Operation(summary = "Search available appointment slots (no patient assigned)")
-    @ApiResponse(responseCode = "200", description = "Available slots found")
+    @Operation(summary = "Search free appointments")
+    @ApiResponse(responseCode = "200", description = "Free appointments")
     @GetMapping("/available")
-    public PageDto<AvailableAppointmentSummary> searchAvailable(
-            @ParameterObject AvailableAppointmentCriteria criteria,
-            @ParameterObject @PageableDefault(size = 20, sort = "id") Pageable pageable){
-        return service.searchAvailable(criteria,pageable);
+    public PageDto<AvailableAppointmentSummary> searchAvailable(@ParameterObject AvailableAppointmentParams params,
+            @ParameterObject @PageableDefault(size = 20, sort = "id") Pageable pageable) {
+        return PageDto.from(service.searchAvailable(mapper.toCriteria(params), AdapterControllerCommon.toPageQuerry(pageable))
+                .map(mapper::toAvailableSummary));
     }
+
     @Operation(summary = "Get appointment by id")
-    @ApiResponse(description = "appointment found", responseCode = "200")
-    @ApiResponse(description = "Appointment not found", responseCode = "404")
-    @GetMapping("{id}")
-    public AppointmentDto findById(@PathVariable @NonNull Long id) {
-        return service.findById(id);
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Appointment found"),
+            @ApiResponse(responseCode = "404", description = "Appointment not found")
+    })
+    @GetMapping("/{id}")
+    public AppointmentDto findById(@PathVariable Long id) {
+        return mapper.toDto(service.findById(id));
     }
 
-    @Operation(summary = "Get appointments by Patient id")
-    @ApiResponse(description = "appointments found", responseCode = "200")
+    @Operation(summary = "Get all appointments of a patient")
+    @ApiResponse(responseCode = "200", description = "Patient appointments")
     @GetMapping("/patient/{id}")
-    public PageDto<AppointmentDto> findAllByPatientId(@PathVariable @NonNull Long id, @ParameterObject @PageableDefault(size = 20, sort = "id") Pageable pageable) {
-        return service.findAllByPatientId(id, pageable);
+    public PageDto<AppointmentDto> findAllByPatientId(@PathVariable Long id,
+            @ParameterObject @PageableDefault(size = 20, sort = "id") Pageable pageable) {
+        return PageDto.from(service.findAllByPatientId(id, AdapterControllerCommon.toPageQuerry(pageable))
+                .map(mapper::toDto));
     }
 
-    @Operation(summary = "Create appointment, patient does not need to be assigned")
-    @ApiResponse(responseCode = "201", description = "Appointment created")
-    @ApiResponse(responseCode = "400", description = "Appointment is in the past or does not start at a full quarter of an hour")
-    @ApiResponse(responseCode = "404", description = "Doctor not found")
-    @ApiResponse(responseCode = "409", description = "Appointment overlaps with another appointment of this doctor")
-    @PostMapping()
+    @Operation(summary = "Create appointment")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Appointment created"),
+            @ApiResponse(responseCode = "400", description = "Invalid date or time"),
+            @ApiResponse(responseCode = "404", description = "Doctor or patient not found"),
+            @ApiResponse(responseCode = "409", description = "Time overlaps with another appointment")
+    })
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public AppointmentDto create(@RequestBody CreateAppointmentCommand command) {
-        return service.create(command);
+        return mapper.toDto(service.create(mapper.toCommand(command)));
     }
 
     @Operation(summary = "Assign patient to appointment")
-    @ApiResponse(responseCode = "200", description = "Patient assigned successfully")
-    @ApiResponse(responseCode = "400", description = "Appointment is already in the past")
-    @ApiResponse(responseCode = "404", description = "Appointment or patient not found")
-    @ApiResponse(responseCode = "409", description = "Appointment is already taken")
-    @PutMapping()
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Patient assigned"),
+            @ApiResponse(responseCode = "404", description = "Appointment or patient not found"),
+            @ApiResponse(responseCode = "409", description = "Appointment already taken")
+    })
+    @PutMapping
     public AppointmentDto assignPatientToAppointment(@RequestBody AssignPatientToAppointmentCommand command) {
-        return service.assignPatientToAppointment(command);
+        return mapper.toDto(service.assignPatientToAppointment(mapper.toCommand(command)));
     }
 
-    @Operation(summary = "Remove Patient from Appointment")
-    @ApiResponse(description = "Appointment not found", responseCode = "404")
-    @ApiResponse(description = "Patient removed successfully", responseCode = "204")
+    @Operation(summary = "Cancel patient's appointment")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Patient removed from appointment"),
+            @ApiResponse(responseCode = "404", description = "Appointment not found")
+    })
     @PatchMapping("/cancel/{appointmentId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void patientAppointmentCancel(@NonNull @PathVariable Long appointmentId) {
+    public void patientAppointmentCancel(@PathVariable Long appointmentId) {
         service.removePatientFromVisit(appointmentId);
     }
 
-    @Operation(summary = "Delete Appointment")
-    @ApiResponse(description = "Appointment deleted successfully", responseCode = "204")
-    @ApiResponse(description = "Appointment not found", responseCode = "404")
-    @DeleteMapping("{id}")
+    @Operation(summary = "Delete appointment")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Appointment deleted"),
+            @ApiResponse(responseCode = "404", description = "Appointment not found")
+    })
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable @NonNull Long id) {
+    public void delete(@PathVariable Long id) {
         service.delete(id);
     }
 }

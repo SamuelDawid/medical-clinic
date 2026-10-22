@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import models.DoctorPOJO;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.Set;
@@ -41,6 +42,7 @@ public class DoctorRepositoryAdapter implements DoctorRepositoryPort {
     }
 
     @Override
+    @Transactional
     public Optional<DoctorPOJO> findByIdForUpdate(Long id) {
         return jpaRepository.findByIdForUpdate(id).map(mapper::toDomain);
     }
